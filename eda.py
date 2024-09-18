@@ -32,16 +32,24 @@ def plot_sales_by_account_type(df):
     """
     Plot the distribution of sales by account type.
     """
+    # Ensure columns are in lowercase and strip any spaces
+    df = df.copy()
+    df.columns = df.columns.str.strip().str.lower()
+
+    # Check if required columns are present
     if 'acctype' not in df.columns or 'sales' not in df.columns:
         st.warning("Columns 'acctype' and 'sales' are required for this plot.")
         return
 
+    # Drop rows with missing values in 'acctype' or 'sales'
+    df = df.dropna(subset=['acctype', 'sales'])
+
+    # Plot sales distribution by account type
     plt.figure(figsize=(8, 6))
     sns.boxplot(x='acctype', y='sales', data=df)
     plt.title("Sales Distribution by Account Type")
     plt.xticks(rotation=45)
-    plt.tight_layout()
-    st.pyplot(plt.gcf())
+    st.pyplot(plt)
 
 def plot_sales_trend(df):
     """
