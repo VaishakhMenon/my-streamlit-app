@@ -22,21 +22,21 @@ if sheet_id:
         if df_cleaned is None or df_cleaned.empty:
             st.error("Failed to load or clean data. Please check the Google Sheet ID and ensure data is valid.")
         else:
-            # Drop the first column if irrelevant (like an index column or unnamed column)
-            df_cleaned = df_cleaned.iloc[:, 1:]
-
+            # Drop the first column and 'Sl' column if they are causing issues
+            if 'Sl' in df_cleaned.columns:
+                df_cleaned = df_cleaned.drop(columns=['Sl'])
+            
+            if '0' in df_cleaned.columns:
+                df_cleaned = df_cleaned.drop(columns=['0'])
+            
             # Drop any completely empty or irrelevant columns
             df_cleaned = df_cleaned.dropna(axis=1, how='all')  # Drop columns with all NaN values
 
-            # Ensure the 'Sl' column is treated as a string
-            if 'Sl' in df_cleaned.columns:
-                df_cleaned['Sl'] = df_cleaned['Sl'].astype(str)
-
-            # Convert all other object-type columns to strings to prevent serialization issues
-            df_cleaned = df_cleaned.applymap(lambda x: str(x) if isinstance(x, (int, float, str)) else '')
+            # Convert object-type columns to string to avoid serialization issues
+            df_cleaned = df_cleaned.astype(str)
 
             # Display cleaned data
-            st.write("Cleaned Data (with explicit type conversion):")
+            st.write("Cleaned Data (after dropping problematic columns):")
             
             try:
                 # Display the first few rows of the cleaned data
