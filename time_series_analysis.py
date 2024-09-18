@@ -45,30 +45,36 @@ def analyze_time_series(df):
 
     # Perform ARIMA forecasting
     st.subheader("ARIMA Forecasting")
-    model = ARIMA(df['sales'], order=(1, 1, 1))
-    model_fit = model.fit()
+    
+    try:
+        model = ARIMA(df['sales'], order=(1, 1, 1))
+        model_fit = model.fit()
 
-    # Forecast for the next 12 months
-    forecast_steps = 12
-    forecast = model_fit.forecast(steps=forecast_steps)
+        # Forecast for the next 12 months
+        forecast_steps = 12
+        forecast = model_fit.forecast(steps=forecast_steps)
 
-    # Generate future dates for the forecast, starting from the last date in the data
-    last_date = df.index[-1]  # Get the last date in the dataset
-    forecast_dates = pd.date_range(last_date, periods=forecast_steps + 1, freq='M')[1:]  # Generate future dates
+        # Generate future dates for the forecast, starting from the last date in the data
+        last_date = df.index[-1]  # Get the last date in the dataset
+        forecast_dates = pd.date_range(last_date, periods=forecast_steps + 1, freq='M')[1:]  # Generate future dates
 
-    # Plot the forecast along with the historical data
-    st.subheader("Sales Forecast for the Next 12 Months")
-    plt.figure(figsize=(10, 6))
-    plt.plot(df['sales'], label='Historical Sales', color='blue', linewidth=2)
-    plt.plot(forecast_dates, forecast, label='Forecasted Sales', color='red', linestyle='--', linewidth=2)
-    plt.xlabel('Month')
-    plt.ylabel(f'Sales{sales_unit}')
-    plt.title('Historical and Forecasted Sales')
-    plt.legend(loc='best')
-    plt.xticks(rotation=45)
-    plt.grid(True)
-    plt.tight_layout()
-    st.pyplot(plt)
+        # Plot the forecast along with the historical data
+        st.subheader("Sales Forecast for the Next 12 Months")
+        plt.figure(figsize=(10, 6))
+        plt.plot(df['sales'], label='Historical Sales', color='blue', linewidth=2)
+        plt.plot(forecast_dates, forecast, label='Forecasted Sales', color='red', linestyle='--', linewidth=2)
+        plt.xlabel('Month')
+        plt.ylabel(f'Sales{sales_unit}')
+        plt.title('Historical and Forecasted Sales')
+        plt.legend(loc='best')
+        plt.xticks(rotation=45)
+        plt.grid(True)
+        plt.tight_layout()
+        st.pyplot(plt)
 
-    # Provide basic inference
-    st.write(f"The ARIMA model predicts sales for the next 12 months. The forecasted values show an expected sales trend, based on historical data and seasonal patterns.")
+        # Provide basic inference
+        st.write(f"The ARIMA model predicts sales for the next 12 months. The forecasted values show an expected sales trend, based on historical data and seasonal patterns.")
+
+    except Exception as e:
+        st.error(f"Error performing ARIMA forecasting: {e}")
+
