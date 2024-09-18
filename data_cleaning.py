@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
+import streamlit as st
 
 def clean_data(df):
     """
     Clean the dataset by converting data types, handling missing or invalid values,
-    and ensuring compatibility with Arrow serialization.
+    removing outliers and negative values, and ensuring compatibility with Arrow serialization.
     """
     # Ensure column names are standardized
     df.columns = df.columns.str.strip().str.lower()
@@ -16,6 +17,21 @@ def clean_data(df):
         df = df.dropna(subset=['month'])
     else:
         raise KeyError("The 'month' column is missing from the data.")
+
+    # Remove rows with negative sales values (if applicable)
+    if 'sales' in df.columns:
+        df = df[df['sales'] >= 0]
+
+    # Handle outliers in 'sales' using the IQR method
+    if 'sales' in df.columns:
+        Q1 = df['sales'].quantile(0.25)
+        Q3 = df['sales'].quantile(0.75)
+        IQR = Q3 - Q1
+        # Define bounds for outliers
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        # Remove outliers
+        df = df[(df['sales'] >= lower_bound) & (df['sales'] <= upper_bound)]
 
     # Define expected numeric columns
     numeric_columns = [
@@ -44,7 +60,7 @@ def clean_data(df):
         df[col] = df[col].astype(str)
         df[col] = df[col].fillna('')
 
-    # Handle remaining columns
+    # Handle remaining columns based on data type
     for col in df.columns:
         if df[col].dtype.kind in 'O':  # Object types
             df[col] = df[col].astype(str)
