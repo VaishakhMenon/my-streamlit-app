@@ -26,6 +26,9 @@ def analyze_time_series(df):
     if max_sales > 1000000:
         df['sales'] = df['sales'] / 1000000
         sales_unit = " (in millions)"
+    elif max_sales > 1000:
+        df['sales'] = df['sales'] / 1000
+        sales_unit = " (in thousands)"
     else:
         sales_unit = ""
 
@@ -51,16 +54,16 @@ def analyze_time_series(df):
     # Plot the forecast along with the historical data
     st.subheader("Sales Forecast for the Next 12 Months")
     plt.figure(figsize=(10, 6))
-    plt.plot(df['sales'], label='Historical Sales')
-    plt.plot(forecast, label='Forecasted Sales', color='red')
+    plt.plot(df['sales'], label='Historical Sales', color='blue', linewidth=2)
+    plt.plot(forecast, label='Forecasted Sales', color='red', linestyle='--', linewidth=2)
     plt.xlabel('Month')
     plt.ylabel(f'Sales{sales_unit}')
     plt.title('Historical and Forecasted Sales')
-    plt.legend()
+    plt.legend(loc='best')
     plt.xticks(rotation=45)
+    plt.grid(True)
     plt.tight_layout()
     st.pyplot(plt)
 
     # Provide basic inference
     st.write(f"The ARIMA model predicts sales for the next 12 months. The forecasted values show an expected sales trend, based on historical data and seasonal patterns.")
-
