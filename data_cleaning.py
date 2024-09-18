@@ -7,10 +7,8 @@ def load_data_from_google_sheets(sheet_id):
     """
     Load data from a Google Sheet using its Sheet ID via gspread.
     """
-    # Define the scope and authorize the credentials
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
    
-    # Access secrets stored in Streamlit
     google_creds = {
         "type": st.secrets["google_api"]["type"],
         "project_id": st.secrets["google_api"]["project_id"],
@@ -24,7 +22,6 @@ def load_data_from_google_sheets(sheet_id):
         "client_x509_cert_url": st.secrets["google_api"]["client_x509_cert_url"]
     }
 
-    # Authenticate and initialize the gspread client using credentials from Streamlit Secrets
     creds = ServiceAccountCredentials.from_json_keyfile_dict(google_creds, scope)
     client = gspread.authorize(creds)
 
@@ -37,48 +34,39 @@ def load_data_from_google_sheets(sheet_id):
 
     return df
 
-def skip_irrelevant_rows(df):
-    """
-    Skip rows that contain irrelevant data such as timestamps or URLs and start processing from the first row of actual data.
-    """
-    irrelevant_row_condition = (df['month'].str.contains(r'https://|drive.google|timestamp', na=False)) | (df['month'].isna())
-    df_cleaned = df[~irrelevant_row_condition]
-    return df_cleaned
-
 def clean_data(sheet_id):
     """
-    Clean the dataset by removing unnecessary rows, and converting the 'month' field to datetime format.
+    Clean the dataset by removing unnecessary rows and ensuring proper data types,
+    while retaining 0 values for numeric columns.
     """
     df = load_data_from_google_sheets(sheet_id)
 
-    # Strip leading/trailing whitespace from column names and ensure lowercase
-    df.columns = df.columns.str.strip().str.lower()
-
-    # Skip irrelevant rows (containing timestamps/URLs)
-    df = skip_irrelevant_rows(df)
-
-    # Drop 'Sl' and other problematic columns if they exist
+    # Drop columns that might be problematic, such as unnamed columns or index columns
     if 'sl' in df.columns:
         df = df.drop(columns=['sl'])
-
     if '0' in df.columns:
         df = df.drop(columns=['0'])
 
-    # Replace any empty strings or whitespace in 'month' column with NaN
-    df['month'] = df['month'].replace(r'^\s*$', None, regex=True)
+    # Ensure all object-type columns are converted to strings to avoid serialization issues
+    df = df.applymap(lambda x: str(x) if isinstance(x, (str, int, float)) else x)
 
-    # Convert 'month' to datetime format
-    df['month'] = pd.to_datetime(df['month'], errors='coerce')
+    # Ensure 'month' column is datetime
+    if 'month' in df.columns:
+        df['month'] = pd.to_datetime(df['month'], errors='coerce')
 
     # Drop rows where 'month' could not be parsed to a valid datetime
     df = df.dropna(subset=['month'])
 
-    # Convert all object-type columns to strings
-    df = df.astype(str)
+    # Convert other relevant columns to numeric types if necessary
+    numeric_columns = ['sales', 'strategy1', 'strategy2', 'strategy3']
+    for col in numeric_columns:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+
+    # Keep 0 values but drop rows where all numeric columns are NaN
+    df = df.dropna(subset=numeric_columns, how='all')
 
     return df
 
-# Example usage (for testing):
+# Example usage:
 # sheet_id = 'your_google_sheet_id'
 # cleaned_df = clean_data(sheet_id)
-# print(cleaned_df.head())
