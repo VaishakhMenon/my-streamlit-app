@@ -1,0 +1,8 @@
+streamlit
+pandas
+gspread
+oauth2client
+matplotlib
+seaborn
+scikit-learn
+statsmodels
