@@ -70,4 +70,3 @@ if sheet_id:
                 st.write(f"Intercept: {model.intercept_}")
 else:
     st.write("Please enter a Google Sheet ID to load and clean data.")
-
