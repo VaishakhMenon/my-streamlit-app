@@ -1,3 +1,5 @@
+# regression.py
+
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -5,9 +7,10 @@ import seaborn as sns
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 
-def display_scatter_plots(df):
+def perform_regression(df):
     """
-    Display scatter plots for predefined relationships between features and sales.
+    Perform regression analysis by displaying scatter plots for predefined relationships
+    between features and sales, and provide inferences.
     """
     st.header("Scatter Plots with Inferences")
 
