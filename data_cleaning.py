@@ -37,6 +37,16 @@ def load_data_from_google_sheets(sheet_id):
 
     return df
 
+def check_mixed_types(df):
+    """
+    Check for mixed data types in each column of the DataFrame and print the issue.
+    """
+    for col in df.columns:
+        unique_types = df[col].apply(type).nunique()
+        if unique_types > 1:
+            print(f"Warning: Column '{col}' has mixed data types.")
+            print(df[col].apply(type).value_counts())
+
 def clean_data(sheet_id):
     """
     Clean the dataset by removing unnecessary rows (timestamps/URLs),
@@ -54,5 +64,8 @@ def clean_data(sheet_id):
 
     # Drop rows where 'month' could not be parsed to a valid datetime
     df = df.dropna(subset=['month'])
+
+    # Check for mixed data types
+    check_mixed_types(df)
 
     return df
