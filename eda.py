@@ -55,15 +55,32 @@ def plot_sales_trend(df):
     """
     Plot the monthly sales trend over time.
     """
+    # Ensure column names are in lowercase
+    df = df.copy()
+    df.columns = df.columns.str.strip().str.lower()
+
+    # Check if the required columns are present
     if 'month' not in df.columns or 'sales' not in df.columns:
         st.warning("Columns 'month' and 'sales' are required for this plot.")
         return
 
+    # Convert the 'month' column to datetime format if it's not already
+    try:
+        df['month'] = pd.to_datetime(df['month'], errors='coerce')
+    except Exception as e:
+        st.error(f"Error converting 'month' column to datetime: {e}")
+        return
+
+    # Drop rows where 'month' could not be converted
+    df = df.dropna(subset=['month'])
+
+    # Group the data by month and sum the sales
     df_grouped = df.groupby('month')['sales'].sum().reset_index()
 
     # Ensure 'month' is sorted in chronological order
     df_grouped = df_grouped.sort_values('month')
 
+    # Plot the sales trend
     plt.figure(figsize=(10, 6))
     sns.lineplot(x='month', y='sales', data=df_grouped, marker='o')
     plt.title("Monthly Sales Trend")
