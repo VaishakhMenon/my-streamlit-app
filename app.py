@@ -1,7 +1,9 @@
 import streamlit as st
-from data_cleaning import clean_data, check_mixed_types
+import pandas as pd
+from data_cleaning import clean_data  # Remove check_mixed_types import
 from eda import plot_correlation_matrix
 from regression import perform_regression
+from utils import load_data_from_google_sheets
 
 # Sidebar for Google Sheet ID input
 st.sidebar.header("Google Sheets Input")
