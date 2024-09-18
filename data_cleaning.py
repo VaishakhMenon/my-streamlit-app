@@ -35,15 +35,28 @@ def load_data_from_google_sheets(sheet_id):
 
 def clean_data(sheet_id):
     """
-    Clean the dataset by removing unnecessary rows (timestamps/URLs),
-    and converting the 'month' field to datetime format.
+    Clean the dataset by fixing mixed data types and removing unnecessary rows (timestamps/URLs).
     """
     df = load_data_from_google_sheets(sheet_id)
-    df.columns = df.columns.str.strip().str.lower()
-
-    df = df[df['month'].notnull()]  # Assuming 'month' is the column to check
-    df['month'] = pd.to_datetime(df['month'], errors='coerce')
+    df.columns = df.columns.str.strip().str.lower()  # Clean up column names
     
+    # Check for mixed types or problematic columns
+    if 'sl' in df.columns:
+        df['sl'] = df['sl'].astype(str)  # Convert 'sl' column to string
+    
+    # Convert the 'month' column to datetime and drop rows where conversion fails
+    if 'month' in df.columns:
+        df['month'] = pd.to_datetime(df['month'], errors='coerce')
+        df = df.dropna(subset=['month'])
+
+    # Convert any other object type columns to strings, to avoid mixed-type issues
+    for col in df.select_dtypes(include=['object']).columns:
+        df[col] = df[col].astype(str)
+
+    # Convert any integer-like columns to int type
+    for col in df.select_dtypes(include=['float', 'int']).columns:
+        df[col] = pd.to_numeric(df[col], downcast='integer', errors='coerce')
+
     st.write("Cleaned Data:")
     st.write(df.head())
     
