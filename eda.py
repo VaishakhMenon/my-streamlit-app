@@ -6,7 +6,7 @@ def plot_correlation_matrix(df):
     Plot a correlation matrix for numerical variables in the dataset.
     """
     plt.figure(figsize=(10, 8))
-    corr_matrix = df.corr()  
+    corr_matrix = df.corr(numeric_only=True)
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt='.2f')
     plt.title("Correlation Matrix")
     plt.show()
