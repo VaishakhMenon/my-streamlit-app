@@ -64,15 +64,14 @@ def plot_sales_trend(df):
         st.warning("Columns 'month' and 'sales' are required for this plot.")
         return
 
-    # Convert the 'month' column to datetime format if it's not already
-    try:
-        df['month'] = pd.to_datetime(df['month'], errors='coerce')
-    except Exception as e:
-        st.error(f"Error converting 'month' column to datetime: {e}")
-        return
+    # Convert 'month' to datetime
+    df['month'] = pd.to_datetime(df['month'], errors='coerce')
 
-    # Drop rows where 'month' could not be converted
-    df = df.dropna(subset=['month'])
+    # Convert 'sales' to numeric, coercing errors
+    df['sales'] = pd.to_numeric(df['sales'], errors='coerce')
+
+    # Drop rows with missing 'month' or 'sales' values
+    df = df.dropna(subset=['month', 'sales'])
 
     # Group the data by month and sum the sales
     df_grouped = df.groupby('month')['sales'].sum().reset_index()
