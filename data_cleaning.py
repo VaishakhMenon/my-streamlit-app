@@ -1,6 +1,8 @@
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import streamlit as st
+
 
 def load_data_from_google_sheets(sheet_id):
     """
