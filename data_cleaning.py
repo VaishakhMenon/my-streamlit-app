@@ -59,12 +59,9 @@ def clean_data(sheet_id):
     # Drop rows where 'month' could not be parsed
     df = df.dropna(subset=['month'])
 
-    # Check for mixed types in columns
-    mixed_columns = check_mixed_types(df)
-    
-    # Downcast int64 columns to int32
-    for col in df.select_dtypes(include='int64').columns:
-        df[col] = pd.to_numeric(df[col], downcast='integer')
+    # Convert the 'Sl' column (or first unnamed column) explicitly to string
+    if 'sl' in df.columns:
+        df['sl'] = df['sl'].astype(str)
 
     # Convert object columns to strings if applicable
     for col in df.select_dtypes(include='object').columns:
@@ -75,3 +72,4 @@ def clean_data(sheet_id):
     st.write(df.dtypes)
 
     return df
+
