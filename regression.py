@@ -1,75 +1,49 @@
-import pandas as pd
 import streamlit as st
-from sklearn.model_selection import train_test_split
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 
-def perform_regression(df):
+def display_scatter_plots(df):
     """
-    Perform linear regression to estimate the impact of selected variables on sales.
+    Display scatter plots for predefined relationships between features and sales.
     """
-    # Ensure column names are in lowercase and stripped of spaces
-    df = df.copy()
-    df.columns = df.columns.str.strip().str.lower()
+    st.header("Scatter Plots with Inferences")
 
-    # Convert numeric columns
-    df = df.apply(pd.to_numeric, errors='coerce')
+    # Ensure that sales is numeric
+    df['sales'] = pd.to_numeric(df['sales'], errors='coerce')
 
-    # Identify numeric columns
-    numeric_columns = df.select_dtypes(include=['float64', 'int64']).columns.tolist()
+    # Define predefined features to compare with sales
+    features = ['strategy1', 'strategy2', 'strategy3']
 
-    if 'sales' not in numeric_columns:
-        st.warning("Column 'sales' is required for regression analysis but is missing.")
-        return
+    # Loop through each feature and create scatter plots with regression lines
+    for feature in features:
+        if feature in df.columns:
+            st.subheader(f"Scatter Plot: {feature} vs. Sales")
+            plt.figure(figsize=(8, 6))
+            sns.regplot(x=feature, y='sales', data=df, ci=None, scatter_kws={'s': 10})
+            plt.xlabel(f"{feature}")
+            plt.ylabel("Sales")
+            plt.title(f"Sales vs. {feature}")
+            st.pyplot(plt)
 
-    if len(numeric_columns) <= 1:
-        st.warning("At least two numeric columns (including 'sales') are required for regression.")
-        return
+            # Perform simple regression to show inference
+            X = df[[feature]].dropna()
+            y = df.loc[X.index, 'sales']
 
-    # Allow the user to select variables for regression
-    st.write("### Select Variables for Regression")
-    independent_vars = st.multiselect(
-        "Select independent variables (features):",
-        [col for col in numeric_columns if col != 'sales']
-    )
+            if len(X) > 0 and len(y) > 0:
+                model = LinearRegression()
+                model.fit(X, y)
+                y_pred = model.predict(X)
 
-    if not independent_vars:
-        st.warning("Please select at least one independent variable for regression.")
-        return
+                mse = mean_squared_error(y, y_pred)
+                r2 = r2_score(y, y_pred)
 
-    # Prepare data for regression
-    X = df[independent_vars].dropna()
-    y = df.loc[X.index, 'sales']  # Align 'sales' with the selected rows
-
-    # Split the dataset into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    # Create the regression model and fit it to the training data
-    model = LinearRegression()
-    model.fit(X_train, y_train)
-
-    # Predict on the test set and evaluate performance
-    y_pred = model.predict(X_test)
-    mse = mean_squared_error(y_test, y_pred)
-    r2 = r2_score(y_test, y_pred)
-
-    # Display results
-    st.subheader("Regression Analysis Results")
-    st.write("### Model Coefficients:")
-    coefficients = pd.DataFrame({
-        'Feature': independent_vars,
-        'Coefficient': model.coef_
-    })
-    st.table(coefficients)
-
-    st.write(f"### Intercept: {model.intercept_:.2f}")
-    st.write(f"### Mean Squared Error: {mse:.2f}")
-    st.write(f"### R-squared: {r2:.2f}")
-
-    # Plot actual vs. predicted values
-    st.write("### Actual vs. Predicted Sales")
-    comparison_df = pd.DataFrame({
-        'Actual Sales': y_test,
-        'Predicted Sales': y_pred
-    })
-    st.scatter_chart(comparison_df)
+                st.write(f"**Inference for {feature}:**")
+                st.write(f" - Mean Squared Error (MSE): {mse:.2f}")
+                st.write(f" - R-squared (R²): {r2:.2f}")
+                st.write(f" - Coefficient: {model.coef_[0]:.2f}")
+                st.write(f" - Intercept: {model.intercept_:.2f}")
+        else:
+            st.warning(f"{feature} column not found in the data.")
