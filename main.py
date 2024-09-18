@@ -1,31 +1,39 @@
-import pandas as pd
-from eda import plot_correlation_matrix
-from regression import perform_regression
-from data_cleaning import clean_data
-# Import other analysis functions as needed
-# from time_series_analysis import decompose_time_series, forecast_sales
-# from market_segmentation import perform_market_segmentation
-# from competitor_analysis import analyze_competitor_impact
-# from future_budget import reallocate_budget
-from pyairtable import Table
+# main.py
 
-# Airtable credentials (you may choose to read these from environment variables or a config file)
+import pandas as pd
+from data_cleaning import clean_data
+from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_trend
+from regression import perform_regression
+from time_series import analyze_time_series
+from segmentation import perform_segmentation
+from competitor_analysis import analyze_competitors
+from budgeting import forecast_budget
+from pyairtable import Api
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Airtable credentials (replace with your actual credentials or load from a config file)
 airtable_token = 'your_personal_access_token'  # Replace with your actual token
 base_id = 'your_base_id'  # Replace with your actual base ID
 table_name = 'Your Table Name'  # Replace with your actual table name
 
-# Initialize the Airtable Table
-table = Table(airtable_token, base_id, table_name)
+# Initialize the Airtable API
+api = Api(airtable_token)
 
 # Load and clean data from Airtable
 try:
+    # Get the Table object
+    table = api.table(base_id, table_name)
+    
     # Fetch all records from the Airtable table
     records = table.all()
+    
     # Extract the fields from the records
     data = [record['fields'] for record in records]
+    
     # Convert the data into a DataFrame
     df = pd.DataFrame(data)
-
+    
     # Clean the data using your existing function
     df_cleaned = clean_data(df)
     print("Data successfully loaded and cleaned.")
@@ -36,31 +44,31 @@ except Exception as e:
 if df_cleaned is not None:
     try:
         # Perform EDA
-        print("Starting EDA...")
+        print("Starting Exploratory Data Analysis (EDA)...")
         plot_correlation_matrix(df_cleaned)
+        plot_sales_by_account_type(df_cleaned)
+        plot_sales_trend(df_cleaned)
 
-        # Perform regression
+        # Perform regression analysis
         print("Running regression analysis...")
         perform_regression(df_cleaned)
 
         # Time series analysis
-        # print("Starting time series analysis...")
-        # decompose_time_series(df_cleaned, 'sales')
-        # forecast_sales(df_cleaned, 'sales')
+        print("Starting time series analysis...")
+        analyze_time_series(df_cleaned)
 
         # Market segmentation
-        # print("Performing market segmentation...")
-        # perform_market_segmentation(df_cleaned)
+        print("Performing market segmentation...")
+        perform_segmentation(df_cleaned)
 
         # Competitor impact analysis
-        # print("Analyzing competitor impact...")
-        # analyze_competitor_impact(df_cleaned)
+        print("Analyzing competitor impact...")
+        analyze_competitors(df_cleaned)
 
-        # Budget reallocation based on strategy efficiency
-        # total_future_budget = 30_000_000  # Example future budget
-        # print("Reallocating budget...")
-        # new_budget_allocation = reallocate_budget(df_cleaned, total_future_budget)
-        # print("New Budget Allocation:", new_budget_allocation)
+        # Future budgeting and resource allocation
+        print("Calculating future budgeting and resource allocation...")
+        forecast_budget(df_cleaned)
+
     except Exception as e:
         print(f"An error occurred during analysis: {e}")
 else:
