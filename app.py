@@ -24,7 +24,7 @@ df_cleaned = None
 # Load data from Google Sheets if a sheet_id is provided
 if sheet_id:
     st.sidebar.header("Data Processing")
-    
+
     if st.sidebar.button("Load and Clean Data"):
         # Attempt to clean data
         df_cleaned = clean_data(sheet_id)
@@ -32,8 +32,15 @@ if sheet_id:
         if df_cleaned is None or df_cleaned.empty:
             st.error("Failed to load or clean data. Please check the Google Sheet ID and ensure data is valid.")
         else:
-            st.write("Cleaned Data:")
-            st.write(df_cleaned.head())
+            # Display cleaned data with type conversion for compatibility
+            st.write("Cleaned Data (with automatic type conversion):")
+            
+            try:
+                # Attempt to fix column types if there are any issues
+                df_cleaned = df_cleaned.convert_dtypes()  # Automatically converts to best possible dtypes
+                st.write(df_cleaned.head())
+            except Exception as e:
+                st.error(f"Error processing data: {e}")
 
             # Sidebar options after data is successfully loaded and cleaned
             st.sidebar.header("Analysis")
