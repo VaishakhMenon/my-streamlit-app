@@ -10,6 +10,8 @@ Original file is located at
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import streamlit as st
+
 
 # Load data from Google Sheets using API
 def load_data_from_google_sheets(sheet_id):
