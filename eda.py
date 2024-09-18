@@ -5,47 +5,29 @@ def plot_correlation_matrix(df):
     """
     Plot a correlation matrix for numerical variables in the dataset.
     """
-    if df.empty:
-        print("DataFrame is empty")  # Debugging empty DataFrame
-        return
-    
-    print("Data types of DataFrame columns:")
-    print(df.dtypes)  # Debugging data types
-
-    try:
-        plt.figure(figsize=(10, 8))
-        corr_matrix = df.corr()  # Assuming cleaned numeric data
-        sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt='.2f')
-        plt.title("Correlation Matrix")
-        plt.show()
-    except Exception as e:
-        print(f"Error plotting correlation matrix: {str(e)}")
+    plt.figure(figsize=(10, 8))
+    corr_matrix = df.corr()  
+    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt='.2f')
+    plt.title("Correlation Matrix")
+    plt.show()
 
 def plot_sales_by_account_type(df):
     """
     Plot the distribution of sales by account type.
     """
-    try:
-        plt.figure(figsize=(8, 6))
-        sns.boxplot(x='acctype', y='sales', data=df)
-        plt.title("Sales Distribution by Account Type")
-        plt.xticks(rotation=45)
-        plt.show()
-    except Exception as e:
-        print(f"Error plotting sales by account type: {str(e)}")
+    plt.figure(figsize=(8, 6))
+    sns.boxplot(x='acctype', y='sales', data=df)
+    plt.title("Sales Distribution by Account Type")
+    plt.xticks(rotation=45)
+    plt.show()
 
 def plot_sales_trend(df):
     """
     Plot the monthly sales trend over time.
     """
-    try:
-        plt.figure(figsize=(10, 6))
-        df_grouped = df.groupby('month')['sales'].sum().reset_index()
-        sns.lineplot(x='month', y='sales', data=df_grouped)
-        plt.title("Monthly Sales Trend")
-        plt.xticks(rotation=45)
-        plt.show()
-    except Exception as e:
-        print(f"Error plotting sales trend: {str(e)}")
-
-# Ensure that 'cleaned_df' is passed into these functions after it is cleaned
+    plt.figure(figsize=(10, 6))
+    df_grouped = df.groupby('month')['sales'].sum().reset_index()
+    sns.lineplot(x='month', y='sales', data=df_grouped)
+    plt.title("Monthly Sales Trend")
+    plt.xticks(rotation=45)
+    plt.show()
