@@ -22,16 +22,22 @@ if sheet_id:
         if df_cleaned is None or df_cleaned.empty:
             st.error("Failed to load or clean data. Please check the Google Sheet ID and ensure data is valid.")
         else:
-            # Ensure 'Sl' column is treated as a string (if it's not numerical)
+            # Ensure 'Sl' column and other problematic columns are treated properly
             if 'Sl' in df_cleaned.columns:
                 df_cleaned['Sl'] = df_cleaned['Sl'].astype(str)
+            
+            if '0' in df_cleaned.columns:
+                df_cleaned['0'] = df_cleaned['0'].astype(str)  # If the column '0' exists, convert to string
+
+            # Drop any completely empty columns or unintended ones
+            df_cleaned = df_cleaned.dropna(axis=1, how='all')  # Drop columns with all NaN values
 
             # Display cleaned data with type conversion for compatibility
-            st.write("Cleaned Data (with automatic type conversion):")
+            st.write("Cleaned Data (with explicit type conversion):")
             
             try:
-                # Attempt to fix column types if there are any issues
-                df_cleaned = df_cleaned.convert_dtypes()  # Automatically converts to best possible dtypes
+                # Convert all columns explicitly to ensure compatibility
+                df_cleaned = df_cleaned.apply(lambda col: col.astype(str) if col.dtype == "object" else col)
                 
                 # Display the first few rows of the cleaned data
                 st.write(df_cleaned.head())
