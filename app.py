@@ -18,27 +18,34 @@ from utils import load_data_from_google_sheets
 st.sidebar.header("Google Sheets Input")
 sheet_id = st.sidebar.text_input("Enter your Google Sheet ID:", "")
 
-# Load data from Google Sheets
+# Initialize a variable for the cleaned data
+df_cleaned = None
+
+# Load data from Google Sheets if a sheet_id is provided
 if sheet_id:
     st.sidebar.header("Data Processing")
     
     if st.sidebar.button("Load and Clean Data"):
+        # Attempt to clean data
         df_cleaned = clean_data(sheet_id)
-        st.write("Cleaned Data:")
-        st.write(df_cleaned.head())
         
-        # Sidebar options after data is loaded and cleaned
-        st.sidebar.header("Analysis")
-        
-        if st.sidebar.button("Plot Correlation Matrix"):
-            st.subheader('Correlation Matrix')
-            plot_correlation_matrix(df_cleaned)
+        if df_cleaned is None or df_cleaned.empty:
+            st.error("Failed to load or clean data. Please check the Google Sheet ID and ensure data is valid.")
+        else:
+            st.write("Cleaned Data:")
+            st.write(df_cleaned.head())
 
-        if st.sidebar.button("Run Regression"):
-            model, X_test, y_test = perform_regression(df_cleaned)
-            st.subheader("Regression Results")
-            st.write(f"Model Coefficients: {model.coef_}")
-            st.write(f"Intercept: {model.intercept_}")
+            # Sidebar options after data is successfully loaded and cleaned
+            st.sidebar.header("Analysis")
 
+            if st.sidebar.button("Plot Correlation Matrix"):
+                st.subheader('Correlation Matrix')
+                plot_correlation_matrix(df_cleaned)
+
+            if st.sidebar.button("Run Regression"):
+                model, X_test, y_test = perform_regression(df_cleaned)
+                st.subheader("Regression Results")
+                st.write(f"Model Coefficients: {model.coef_}")
+                st.write(f"Intercept: {model.intercept_}")
 else:
     st.write("Please enter a Google Sheet ID to load and clean data.")
