@@ -1,8 +1,9 @@
+# app.py
+
 import streamlit as st
-from data_cleaning import clean_data
-from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_trend
-from pyairtable import Api
 import pandas as pd
+from utils import load_and_clean_data_from_airtable
+from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_trend
 from regression import perform_regression
 from time_series import analyze_time_series
 from segmentation import perform_segmentation
@@ -39,23 +40,8 @@ if airtable_token and base_id and table_name:
 
     if st.sidebar.button("Load and Clean Data"):
         try:
-            # Initialize the Api object
-            api = Api(airtable_token)
-
-            # Get the Table object
-            table = api.table(base_id, table_name)
-
-            # Fetch all records from the Airtable table
-            records = table.all()
-
-            # Extract the fields from the records
-            data = [record['fields'] for record in records]
-
-            # Convert the data into a DataFrame
-            df = pd.DataFrame(data)
-
-            # Clean the data using your existing function
-            df_cleaned = clean_data(df)
+            # Load and clean the data from Airtable using the utility function
+            df_cleaned = load_and_clean_data_from_airtable(airtable_token, base_id, table_name)
 
             # Store the cleaned data in session state
             st.session_state.df_cleaned = df_cleaned
@@ -73,69 +59,54 @@ if airtable_token and base_id and table_name:
 
     # Analysis options
     if st.session_state.df_cleaned is not None:
-        st.sidebar.header("Analysis Options")
-        analysis_options = st.sidebar.multiselect(
-            "Select analyses to perform:",
-            [
-                "Correlation Matrix",
-                "Sales by Account Type",
-                "Sales Trend",
-                "Regression Analysis",
-                "Time Series Analysis",
-                "Market Segmentation",
-                "Competitor Analysis",
-                "Future Budgeting",
-            ]
-        )
+        st.sidebar.header("Analysis")
+        if st.sidebar.button("Plot Correlation Matrix"):
+            try:
+                plot_correlation_matrix(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error plotting correlation matrix: {e}")
 
-        if analysis_options:
-            tabs = st.tabs(analysis_options)
+        if st.sidebar.button("Plot Sales by Account Type"):
+            try:
+                plot_sales_by_account_type(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error plotting sales by account type: {e}")
 
-            for i, analysis in enumerate(analysis_options):
-                with tabs[i]:
-                    if analysis == "Correlation Matrix":
-                        try:
-                            plot_correlation_matrix(st.session_state.df_cleaned)
-                        except Exception as e:
-                            st.error(f"Error plotting correlation matrix: {e}")
-                    elif analysis == "Sales by Account Type":
-                        try:
-                            plot_sales_by_account_type(st.session_state.df_cleaned)
-                        except Exception as e:
-                            st.error(f"Error plotting sales by account type: {e}")
-                    elif analysis == "Sales Trend":
-                        try:
-                            plot_sales_trend(st.session_state.df_cleaned)
-                        except Exception as e:
-                            st.error(f"Error plotting sales trend: {e}")
-                    elif analysis == "Regression Analysis":
-                        try:
-                            perform_regression(st.session_state.df_cleaned)
-                        except Exception as e:
-                            st.error(f"Error performing regression analysis: {e}")
-                    elif analysis == "Time Series Analysis":
-                        try:
-                            analyze_time_series(st.session_state.df_cleaned)
-                        except Exception as e:
-                            st.error(f"Error performing time series analysis: {e}")
-                    elif analysis == "Market Segmentation":
-                        try:
-                            perform_segmentation(st.session_state.df_cleaned)
-                        except Exception as e:
-                            st.error(f"Error performing market segmentation: {e}")
-                    elif analysis == "Competitor Analysis":
-                        try:
-                            analyze_competitors(st.session_state.df_cleaned)
-                        except Exception as e:
-                            st.error(f"Error performing competitor analysis: {e}")
-                    elif analysis == "Future Budgeting":
-                        try:
-                            forecast_budget(st.session_state.df_cleaned)
-                        except Exception as e:
-                            st.error(f"Error performing future budgeting: {e}")
-        else:
-            st.info("Please select at least one analysis to perform.")
-    else:
-        st.info("Please load and clean data before performing analysis.")
+        if st.sidebar.button("Plot Sales Trend"):
+            try:
+                plot_sales_trend(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error plotting sales trend: {e}")
+
+        if st.sidebar.button("Run Regression Analysis"):
+            try:
+                perform_regression(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error performing regression analysis: {e}")
+
+        if st.sidebar.button("Time Series Analysis"):
+            try:
+                analyze_time_series(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error performing time series analysis: {e}")
+
+        if st.sidebar.button("Market Segmentation"):
+            try:
+                perform_segmentation(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error performing market segmentation: {e}")
+
+        if st.sidebar.button("Competitor Analysis"):
+            try:
+                analyze_competitors(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error performing competitor analysis: {e}")
+
+        if st.sidebar.button("Future Budget Allocation"):
+            try:
+                forecast_budget(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error performing future budget analysis: {e}")
+
 else:
     st.info("Please provide your Airtable credentials to load and clean data.")
