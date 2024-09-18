@@ -96,4 +96,8 @@ def clean_data(df):
     # Ensure there are no remaining NaN values
     df = df.fillna('')
 
+    st.write("Columns after cleaning:", df.columns)
+    st.write(df.dtypes)
+
+
     return df
