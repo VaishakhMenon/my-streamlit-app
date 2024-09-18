@@ -1,7 +1,7 @@
 import streamlit as st
 from data_cleaning import clean_data
 from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_trend
-from pyairtable import Api  # Use Api or Base as per your preference
+from pyairtable import Api
 import pandas as pd
 
 # Title of the Streamlit app
@@ -48,8 +48,13 @@ if airtable_token and base_id and table_name:
             # Clean the data using your existing function
             df_cleaned = clean_data(df)
 
-            st.write("Data types:")
+            # Display data types
+            st.write("Data Types of Cleaned DataFrame:")
             st.write(df_cleaned.dtypes)
+
+            # Display the cleaned DataFrame
+            st.write("Cleaned Data:")
+            st.dataframe(df_cleaned)
 
             # Analysis options
             st.sidebar.header("Analysis")
