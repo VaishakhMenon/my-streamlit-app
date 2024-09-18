@@ -56,5 +56,18 @@ def perform_segmentation(df):
         # Select features for x and y axes
         x_axis = st.selectbox("Select feature for X-axis:", selected_features)
         y_axis_options = [col for col in selected_features if col != x_axis]
+        
         if y_axis_options:
-            y_axis = st.selectbox("Select feature for Y-axis:", y_
+            y_axis = st.selectbox("Select feature for Y-axis:", y_axis_options)
+
+            # Plot the clusters
+            plt.figure(figsize=(10, 6))
+            sns.scatterplot(x=x_axis, y=y_axis, hue='Segment', data=df_clustered, palette='deep')
+            plt.title(f"K-Means Clustering with {n_clusters} Clusters")
+            plt.xlabel(x_axis)
+            plt.ylabel(y_axis)
+            st.pyplot(plt)
+
+    # Show the clustered data
+    st.write("### Clustered Data")
+    st.dataframe(df_clustered)
