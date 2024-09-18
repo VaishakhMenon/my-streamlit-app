@@ -7,15 +7,13 @@ def load_data_from_google_sheets(sheet_id):
     """
     Load data from a Google Sheet using its Sheet ID via gspread.
     """
-    # Define the scope and authorize the credentials
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-
-    # Access secrets stored in Streamlit
+    
     google_creds = {
         "type": st.secrets["google_api"]["type"],
         "project_id": st.secrets["google_api"]["project_id"],
         "private_key_id": st.secrets["google_api"]["private_key_id"],
-        "private_key": st.secrets["google_api"]["private_key"].replace('\\n', '\n'),  
+        "private_key": st.secrets["google_api"]["private_key"].replace('\\n', '\n'), 
         "client_email": st.secrets["google_api"]["client_email"],
         "client_id": st.secrets["google_api"]["client_id"],
         "auth_uri": st.secrets["google_api"]["auth_uri"],
@@ -33,31 +31,32 @@ def load_data_from_google_sheets(sheet_id):
     
     return df
 
+def skip_irrelevant_rows(df):
+    """
+    Remove irrelevant rows like timestamps and URLs.
+    """
+    irrelevant_row_condition = df['Sl'].apply(lambda x: pd.to_numeric(x, errors='coerce')).isna()
+    df_cleaned = df[~irrelevant_row_condition]
+    return df_cleaned
+
 def clean_data(sheet_id):
     """
-    Clean the dataset by fixing mixed data types and removing unnecessary rows (timestamps/URLs).
+    Clean the dataset by removing unnecessary rows, converting the 'month' field to datetime, 
+    and handling mixed types.
     """
     df = load_data_from_google_sheets(sheet_id)
-    df.columns = df.columns.str.strip().str.lower()  # Clean up column names
     
-    # Check for mixed types or problematic columns
-    if 'sl' in df.columns:
-        df['sl'] = df['sl'].astype(str)  # Convert 'sl' column to string
+    df.columns = df.columns.str.strip().str.lower()
+
+    df = skip_irrelevant_rows(df)
+
+    # Convert columns to appropriate types
+    df['month'] = pd.to_datetime(df['month'], errors='coerce')
+    numeric_columns = ['sales', 'qty', 'strategy1', 'strategy2', 'strategy3', 'salesvisit1', 'salesvisit2', 'salesvisit3', 'salesvisit4', 'salesvisit5']
+    df[numeric_columns] = df[numeric_columns].apply(pd.to_numeric, errors='coerce')
+
+    df['accid'] = df['accid'].astype(str)
     
-    # Convert the 'month' column to datetime and drop rows where conversion fails
-    if 'month' in df.columns:
-        df['month'] = pd.to_datetime(df['month'], errors='coerce')
-        df = df.dropna(subset=['month'])
-
-    # Convert any other object type columns to strings, to avoid mixed-type issues
-    for col in df.select_dtypes(include=['object']).columns:
-        df[col] = df[col].astype(str)
-
-    # Convert any integer-like columns to int type
-    for col in df.select_dtypes(include=['float', 'int']).columns:
-        df[col] = pd.to_numeric(df[col], downcast='integer', errors='coerce')
-
-    st.write("Cleaned Data:")
-    st.write(df.head())
+    df = df.dropna(subset=['month'])
     
     return df
