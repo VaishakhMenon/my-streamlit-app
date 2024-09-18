@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
@@ -7,32 +8,51 @@ def plot_correlation_matrix(df):
     """
     Plot a correlation matrix for numerical variables in the dataset.
     """
-    # Attempt to convert all columns to numeric where possible
-    df_numeric = df.copy()
-    df_numeric = df_numeric.apply(pd.to_numeric, errors='coerce')
-
     # Define the potential columns for correlation analysis
     possible_corr_columns = [
         'accsize', 'acctargets', 'district', 'sales', 'qty', 'strategy1', 
         'strategy2', 'strategy3', 'salesvisit1', 'salesvisit2', 'salesvisit3', 
         'salesvisit4', 'salesvisit5', 'compbrand'
     ]
-
+    
     # Filter to only the columns that exist in the DataFrame
-    available_corr_columns = [col for col in possible_corr_columns if col in df_numeric.columns]
-
+    available_corr_columns = [col for col in possible_corr_columns if col in df.columns]
+    
     if not available_corr_columns:
-        st.warning("No numerical columns available for correlation matrix.")
+        st.warning("No columns available for correlation matrix.")
         return
-
-    # Calculate correlation matrix using the available columns
-    corr_matrix = df_numeric[available_corr_columns].corr()
-
+    
+    # Create a copy of the DataFrame with only the available columns
+    df_corr = df[available_corr_columns].copy()
+    
+    # Convert columns to numeric, coercing errors to NaN
+    for col in df_corr.columns:
+        df_corr[col] = pd.to_numeric(df_corr[col], errors='coerce')
+    
+    # Calculate correlation matrix
+    corr_matrix = df_corr.corr(method='pearson', min_periods=1)
+    
     # Plot correlation matrix
-    plt.figure(figsize=(12, 10))
-    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
+    plt.figure(figsize=(15, 12))
+    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', linewidths=0.5, fmt='.2f', square=True)
     plt.title("Correlation Matrix of Available Key Metrics")
+    plt.tight_layout()
     st.pyplot(plt)
+    
+    # Display the correlation matrix as a table
+    st.write("Correlation Matrix:")
+    st.write(corr_matrix)
+    
+    # Display information about missing values
+    st.write("Missing values in each column:")
+    st.write(df_corr.isnull().sum())
+    
+    # Display data types of each column
+    st.write("Data types of each column:")
+    st.write(df_corr.dtypes)
+
+# Example usage:
+# plot_correlation_matrix(your_dataframe)
 
 def plot_sales_by_account_type(df):
     """
