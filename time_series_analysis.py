@@ -21,6 +21,14 @@ def analyze_time_series(df):
         st.warning("No data available after processing. Please check your date and value columns.")
         return
 
+    # Rescale sales if necessary
+    max_sales = df['sales'].max()
+    if max_sales > 1000000:
+        df['sales'] = df['sales'] / 1000000
+        sales_unit = " (in millions)"
+    else:
+        sales_unit = ""
+
     # Set 'month' as the index
     df.set_index('month', inplace=True)
 
@@ -28,6 +36,7 @@ def analyze_time_series(df):
     st.subheader("Seasonal Decomposition")
     decomposition = seasonal_decompose(df['sales'], model='additive', period=12)
     fig = decomposition.plot()
+    fig.suptitle(f'Seasonal Decomposition of Sales{sales_unit}', fontsize=16)
     plt.tight_layout()
     st.pyplot(fig)
 
@@ -45,7 +54,7 @@ def analyze_time_series(df):
     plt.plot(df['sales'], label='Historical Sales')
     plt.plot(forecast, label='Forecasted Sales', color='red')
     plt.xlabel('Month')
-    plt.ylabel('Sales')
+    plt.ylabel(f'Sales{sales_unit}')
     plt.title('Historical and Forecasted Sales')
     plt.legend()
     plt.xticks(rotation=45)
