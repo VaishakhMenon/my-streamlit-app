@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 from data_cleaning import clean_data
 from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_trend
 
