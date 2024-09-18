@@ -21,6 +21,12 @@ if sheet_id:
             
             # Sidebar options after data is loaded and cleaned
             st.sidebar.header("Analysis")
+
+             try:
+            from data_cleaning import clean_data
+            except Exception as e:
+            st.error(f"Error importing clean_data: {e}")
+
             
             if st.sidebar.button("Plot Correlation Matrix"):
                 try:
@@ -39,5 +45,6 @@ if sheet_id:
                     st.write(f"Error running regression: {e}")
         except Exception as e:
             st.write(f"Error cleaning data: {e}")
+           
 else:
     st.write("Please enter a Google Sheet ID to load and clean data.")
