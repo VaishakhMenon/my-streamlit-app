@@ -63,3 +63,15 @@ if airtable_token and base_id and table_name:
             st.error(f"Error cleaning data or performing analysis: {e}")
 else:
     st.info("Please provide your Airtable credentials to load and clean data.")
+
+# Analysis options
+st.sidebar.header("Analysis")
+if st.sidebar.button("Plot Correlation Matrix"):
+    plot_correlation_matrix(df_cleaned)
+
+if st.sidebar.button("Plot Sales by Account Type"):
+    plot_sales_by_account_type(df_cleaned)
+
+if st.sidebar.button("Plot Sales Trend"):
+    plot_sales_trend(df_cleaned)
+
