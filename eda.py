@@ -94,6 +94,8 @@ def plot_correlation_matrix(df):
 #
 # if __name__ == "__main__":
 #     main()
+
+
 def plot_sales_trend(df):
     """
     Plot the monthly sales trend over time with competitor entries.
