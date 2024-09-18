@@ -53,6 +53,8 @@ def clean_data(sheet_id):
     
     # Convert columns to more appropriate types
     for col in object_columns:
+        # Convert to string first, then check for numeric values
+        df[col] = df[col].astype(str)
         if df[col].str.isnumeric().all():  # Convert columns with numeric values
             df[col] = pd.to_numeric(df[col], errors='coerce')
         else:
