@@ -15,6 +15,9 @@ def perform_regression(df):
     """
     Perform linear regression to estimate the impact of marketing strategies on sales.
     """
+    if df is None or df.empty:
+        raise ValueError("The dataframe is empty or None. Cannot perform regression.")
+
     # Define the independent variables (strategies) and the dependent variable (sales)
     X = df[['strategy1', 'strategy2', 'strategy3']]
     y = df['sales']
@@ -36,7 +39,4 @@ def perform_regression(df):
     print(f"Mean Squared Error: {mse}")
     print(f"R-squared: {r2}")
 
-    return model
-
-# Perform regression
-model = perform_regression(cleaned_df)
+    return model, X_test, y_test
