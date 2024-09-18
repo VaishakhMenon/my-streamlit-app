@@ -4,6 +4,9 @@ from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_
 from pyairtable import Api
 import pandas as pd
 
+st.write(f"Streamlit version: {st.__version__}")
+
+
 # Title of the Streamlit app
 st.title("Airtable Data Analysis App")
 
