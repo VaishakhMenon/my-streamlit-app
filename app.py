@@ -1,12 +1,14 @@
+# app.py
+
 import streamlit as st
 import pandas as pd
 from utils import load_and_clean_data_from_airtable
 from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_trend
-from regression import perform_regression
-from time_series_analysis import analyze_time_series  # Correct file name
-from market_segmentation import perform_segmentation  # Correct file name
+from regression import perform_regression  # Importing corrected function name
+from time_series_analysis import analyze_time_series
+from market_segmentation import perform_segmentation
 from competitor_analysis import analyze_competitors
-from future_budget import forecast_budget  # Correct file name
+from future_budget import forecast_budget
 
 # Title of the Streamlit app
 st.title("Airtable Data Analysis App")
@@ -58,6 +60,7 @@ if airtable_token and base_id and table_name:
     # Analysis options
     if st.session_state.df_cleaned is not None:
         st.sidebar.header("Analysis")
+        
         if st.sidebar.button("Plot Correlation Matrix"):
             try:
                 plot_correlation_matrix(st.session_state.df_cleaned)
