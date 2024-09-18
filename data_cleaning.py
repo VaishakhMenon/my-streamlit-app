@@ -1,14 +1,21 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
+from scipy import stats
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def clean_data(df):
     """
     Clean the dataset by converting data types, handling missing or invalid values,
-    removing outliers and negative values, and ensuring compatibility with Arrow serialization.
+    removing outliers, negative values, and ensuring compatibility with Arrow serialization.
     """
     # Ensure column names are standardized
     df.columns = df.columns.str.strip().str.lower()
+
+    # Drop the 'Unnamed: 0' column if it exists
+    if 'unnamed: 0' in df.columns:
+        df.drop(columns=['unnamed: 0'], inplace=True)
 
     # Convert 'month' column to datetime
     if 'month' in df.columns:
@@ -18,20 +25,31 @@ def clean_data(df):
     else:
         raise KeyError("The 'month' column is missing from the data.")
 
-    # Remove rows with negative sales values (if applicable)
-    if 'sales' in df.columns:
-        df = df[df['sales'] >= 0]
+    # Convert 'acctype' to categorical type
+    if 'acctype' in df.columns:
+        df['acctype'] = df['acctype'].astype('category')
 
-    # Handle outliers in 'sales' using the IQR method
-    if 'sales' in df.columns:
-        Q1 = df['sales'].quantile(0.25)
-        Q3 = df['sales'].quantile(0.75)
-        IQR = Q3 - Q1
-        # Define bounds for outliers
-        lower_bound = Q1 - 1.5 * IQR
-        upper_bound = Q3 + 1.5 * IQR
-        # Remove outliers
-        df = df[(df['sales'] >= lower_bound) & (df['sales'] <= upper_bound)]
+    # Remove rows with negative values in 'sales' and 'strategy' columns
+    df = df[(df['sales'] >= 0) & (df['strategy1'] >= 0) & (df['strategy2'] >= 0) & (df['strategy3'] >= 0)]
+
+    # Handle outliers in 'sales' and 'qty' using the IQR method
+    if 'sales' in df.columns and 'qty' in df.columns:
+        # Boxplots to visualize outliers (optional: for display during cleaning)
+        plt.figure(figsize=(10, 6))
+        sns.boxplot(data=df['sales'])
+        plt.title('Boxplot of Sales')
+        st.pyplot(plt)
+
+        plt.figure(figsize=(10, 6))
+        sns.boxplot(data=df['qty'])
+        plt.title('Boxplot of Quantity')
+        st.pyplot(plt)
+
+        # Remove outliers using Z-scores
+        z_scores_sales = np.abs(stats.zscore(df['sales']))
+        z_scores_qty = np.abs(stats.zscore(df['qty']))
+
+        df = df[(z_scores_sales <= 3) & (z_scores_qty <= 3)]
 
     # Define expected numeric columns
     numeric_columns = [
