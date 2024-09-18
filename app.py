@@ -42,8 +42,9 @@ if airtable_token and base_id and table_name:
             # Convert the data into a DataFrame
             df = pd.DataFrame(data)
 
-            # Clean the data using your existing function
+            # Clean the data using the updated function
             df_cleaned = clean_data(df)
+
             st.write("Data types:")
             st.write(df_cleaned.dtypes)
 
