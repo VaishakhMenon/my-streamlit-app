@@ -9,7 +9,6 @@ from segmentation import perform_segmentation
 from competitor_analysis import analyze_competitors
 from budgeting import forecast_budget
 
-
 # Title of the Streamlit app
 st.title("Airtable Data Analysis App")
 
@@ -74,24 +73,68 @@ if airtable_token and base_id and table_name:
 
     # Analysis options
     if st.session_state.df_cleaned is not None:
-        st.sidebar.header("Analysis")
-        if st.sidebar.button("Plot Correlation Matrix"):
-            try:
-                plot_correlation_matrix(st.session_state.df_cleaned)
-            except Exception as e:
-                st.error(f"Error plotting correlation matrix: {e}")
+        st.sidebar.header("Analysis Options")
+        analysis_options = st.sidebar.multiselect(
+            "Select analyses to perform:",
+            [
+                "Correlation Matrix",
+                "Sales by Account Type",
+                "Sales Trend",
+                "Regression Analysis",
+                "Time Series Analysis",
+                "Market Segmentation",
+                "Competitor Analysis",
+                "Future Budgeting",
+            ]
+        )
 
-        if st.sidebar.button("Plot Sales by Account Type"):
-            try:
-                plot_sales_by_account_type(st.session_state.df_cleaned)
-            except Exception as e:
-                st.error(f"Error plotting sales by account type: {e}")
+        if analysis_options:
+            tabs = st.tabs(analysis_options)
 
-        if st.sidebar.button("Plot Sales Trend"):
-            try:
-                plot_sales_trend(st.session_state.df_cleaned)
-            except Exception as e:
-                st.error(f"Error plotting sales trend: {e}")
+            for i, analysis in enumerate(analysis_options):
+                with tabs[i]:
+                    if analysis == "Correlation Matrix":
+                        try:
+                            plot_correlation_matrix(st.session_state.df_cleaned)
+                        except Exception as e:
+                            st.error(f"Error plotting correlation matrix: {e}")
+                    elif analysis == "Sales by Account Type":
+                        try:
+                            plot_sales_by_account_type(st.session_state.df_cleaned)
+                        except Exception as e:
+                            st.error(f"Error plotting sales by account type: {e}")
+                    elif analysis == "Sales Trend":
+                        try:
+                            plot_sales_trend(st.session_state.df_cleaned)
+                        except Exception as e:
+                            st.error(f"Error plotting sales trend: {e}")
+                    elif analysis == "Regression Analysis":
+                        try:
+                            perform_regression(st.session_state.df_cleaned)
+                        except Exception as e:
+                            st.error(f"Error performing regression analysis: {e}")
+                    elif analysis == "Time Series Analysis":
+                        try:
+                            analyze_time_series(st.session_state.df_cleaned)
+                        except Exception as e:
+                            st.error(f"Error performing time series analysis: {e}")
+                    elif analysis == "Market Segmentation":
+                        try:
+                            perform_segmentation(st.session_state.df_cleaned)
+                        except Exception as e:
+                            st.error(f"Error performing market segmentation: {e}")
+                    elif analysis == "Competitor Analysis":
+                        try:
+                            analyze_competitors(st.session_state.df_cleaned)
+                        except Exception as e:
+                            st.error(f"Error performing competitor analysis: {e}")
+                    elif analysis == "Future Budgeting":
+                        try:
+                            forecast_budget(st.session_state.df_cleaned)
+                        except Exception as e:
+                            st.error(f"Error performing future budgeting: {e}")
+        else:
+            st.info("Please select at least one analysis to perform.")
     else:
         st.info("Please load and clean data before performing analysis.")
 else:
