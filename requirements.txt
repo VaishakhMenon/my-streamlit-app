@@ -1,5 +1,6 @@
 streamlit
 pandas
+pyarrow
 gspread
 oauth2client
 matplotlib
