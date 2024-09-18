@@ -11,29 +11,28 @@ def plot_correlation_matrix(df):
     df_numeric = df.copy()
     df_numeric = df_numeric.apply(pd.to_numeric, errors='coerce')
 
-    # Define important columns for correlation analysis
-    corr_columns = [
+    # Define the potential columns for correlation analysis
+    possible_corr_columns = [
         'accsize', 'acctargets', 'district', 'sales', 'qty', 'strategy1', 
         'strategy2', 'strategy3', 'salesvisit1', 'salesvisit2', 'salesvisit3', 
         'salesvisit4', 'salesvisit5', 'compbrand'
     ]
 
-    # Filter to only relevant numeric columns
-    df_numeric = df_numeric[corr_columns].dropna()
+    # Filter to only the columns that exist in the DataFrame
+    available_corr_columns = [col for col in possible_corr_columns if col in df_numeric.columns]
 
-    if df_numeric.empty:
+    if not available_corr_columns:
         st.warning("No numerical columns available for correlation matrix.")
         return
 
-    # Calculate correlation matrix
-    corr_matrix = df_numeric.corr()
+    # Calculate correlation matrix using the available columns
+    corr_matrix = df_numeric[available_corr_columns].corr()
 
     # Plot correlation matrix
     plt.figure(figsize=(12, 10))
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
-    plt.title("Correlation Matrix of Key Metrics")
+    plt.title("Correlation Matrix of Available Key Metrics")
     st.pyplot(plt)
-
 
 def plot_sales_by_account_type(df):
     """
