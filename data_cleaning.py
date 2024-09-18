@@ -1,49 +1,7 @@
-import pandas as pd
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-import streamlit as st
-
-def load_data_from_google_sheets(sheet_id):
-    # Load the dataset from Google Sheets
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    
-    google_creds = {
-        "type": st.secrets["google_api"]["type"],
-        "project_id": st.secrets["google_api"]["project_id"],
-        "private_key_id": st.secrets["google_api"]["private_key_id"],
-        "private_key": st.secrets["google_api"]["private_key"].replace('\\n', '\n'),
-        "client_email": st.secrets["google_api"]["client_email"],
-        "client_id": st.secrets["google_api"]["client_id"],
-        "auth_uri": st.secrets["google_api"]["auth_uri"],
-        "token_uri": st.secrets["google_api"]["token_uri"],
-        "auth_provider_x509_cert_url": st.secrets["google_api"]["auth_provider_x509_cert_url"],
-        "client_x509_cert_url": st.secrets["google_api"]["client_x509_cert_url"]
-    }
-
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(google_creds, scope)
-    client = gspread.authorize(creds)
-
-    sheet = client.open_by_key(sheet_id).sheet1
-    data = sheet.get_all_records()
-    df = pd.DataFrame(data)
-
-    return df
-
-def check_mixed_types(df):
-    """
-    Check if there are columns with mixed types in the DataFrame and print the problematic rows.
-    """
-    mixed_columns = []
-    for col in df.columns:
-        if df[col].apply(lambda x: isinstance(x, str)).any() and df[col].apply(lambda x: pd.api.types.is_numeric_dtype(type(x))).any():
-            mixed_columns.append(col)
-            st.write(f"Column '{col}' contains mixed types.")
-    
-    return mixed_columns
-
 def clean_data(sheet_id):
     """
-    Clean the dataset by removing unnecessary rows and ensuring proper data types.
+    Clean the dataset by removing unnecessary rows, handling null values,
+    converting the 'month' column to datetime format, and ensuring proper data types.
     """
     df = load_data_from_google_sheets(sheet_id)
 
@@ -59,24 +17,26 @@ def clean_data(sheet_id):
     # Drop rows where 'month' could not be parsed
     df = df.dropna(subset=['month'])
 
-    # Convert the first column (Sl or unnamed) to string explicitly
+    # Convert the first column to string explicitly
     if df.columns[0]:
-        df[df.columns[0]] = df[df.columns[0]].astype('string')
+        df[df.columns[0]] = df[df.columns[0]].astype(str)
 
     # Handle null values in the first column
     df[df.columns[0]] = df[df.columns[0]].fillna('')
 
-    # Apply standardization of mixed data types
-    df[df.columns[0]] = df[df.columns[0]].apply(lambda x: str(x) if pd.notnull(x) else x)
-
-    # Convert object columns to strings if applicable
+    # Check if any object type columns need to be converted to string type
     for col in df.select_dtypes(include='object').columns:
-        df[col] = df[col].astype('string')
+        df[col] = df[col].astype(str)
 
     # Display types after cleaning
     st.write("Data Types of Cleaned DataFrame:")
     st.write(df.dtypes)
 
+    # Try applying fixes before returning the DataFrame to Streamlit
+    try:
+        df = df.convert_dtypes()  # This will convert to the best possible types
+        df = df.astype('string')  # Apply conversion to string where possible
+    except Exception as e:
+        st.write(f"Error in type conversion: {e}")
+
     return df
-
-
