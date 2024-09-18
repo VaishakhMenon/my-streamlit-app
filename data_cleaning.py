@@ -4,7 +4,35 @@ from oauth2client.service_account import ServiceAccountCredentials
 import streamlit as st
 
 def load_data_from_google_sheets(sheet_id):
-    # (Existing code to load data from Google Sheets)
+    """
+    Load data from a Google Sheet using its Sheet ID via gspread.
+    """
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+   
+    google_creds = {
+        "type": st.secrets["google_api"]["type"],
+        "project_id": st.secrets["google_api"]["project_id"],
+        "private_key_id": st.secrets["google_api"]["private_key_id"],
+        "private_key": st.secrets["google_api"]["private_key"].replace('\\n', '\n'),  # Handle line breaks in the private key
+        "client_email": st.secrets["google_api"]["client_email"],
+        "client_id": st.secrets["google_api"]["client_id"],
+        "auth_uri": st.secrets["google_api"]["auth_uri"],
+        "token_uri": st.secrets["google_api"]["token_uri"],
+        "auth_provider_x509_cert_url": st.secrets["google_api"]["auth_provider_x509_cert_url"],
+        "client_x509_cert_url": st.secrets["google_api"]["client_x509_cert_url"]
+    }
+
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(google_creds, scope)
+    client = gspread.authorize(creds)
+
+    # Open the Google Sheet by ID
+    sheet = client.open_by_key(sheet_id).sheet1
+
+    # Get all data from the Google Sheet and convert it into a DataFrame
+    data = sheet.get_all_records()
+    df = pd.DataFrame(data)
+
+    return df
 
 def clean_data(sheet_id):
     """
@@ -72,7 +100,3 @@ def print_column_info(df, problematic_column=None, num_rows=5):
         for col in object_columns:
             print(f"Column '{col}': First {num_rows} values")
             print(df[col].head(num_rows))
-
-# Example usage:
-# sheet_id = 'your_google_sheet_id'
-# cleaned_df = clean_data(sheet_id)
