@@ -51,8 +51,8 @@ if sheet_id:
                 plot_sales_trend(df_cleaned)
 
             if st.sidebar.button("Run Regression"):
+                st.subheader('Regression Analysis')
                 model, X_test, y_test = perform_regression(df_cleaned)
-                st.subheader("Regression Results")
                 st.write(f"Model Coefficients: {model.coef_}")
                 st.write(f"Intercept: {model.intercept_}")
 else:
