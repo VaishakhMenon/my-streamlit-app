@@ -36,10 +36,13 @@ def plot_correlation_matrix(df):
     
     # Function to convert to numeric if possible, otherwise to categorical
     def to_numeric_or_categorical(column):
-        try:
-            return pd.to_numeric(column)
-        except ValueError:
-            return column.astype('category')
+        if pd.api.types.is_numeric_dtype(column):
+            return column
+        else:
+            try:
+                return pd.to_numeric(column)
+            except ValueError:
+                return column.astype('category')
     
     # Apply the conversion function to each column
     for col in df_corr.columns:
@@ -52,11 +55,17 @@ def plot_correlation_matrix(df):
         for col2 in df_corr.columns:
             if df_corr[col1].dtype.name == 'category' or df_corr[col2].dtype.name == 'category':
                 # Use Cramer's V for categorical variables
-                cramers_v = calculate_cramers_v(df_corr[col1], df_corr[col2])
-                corr_matrix.loc[col1, col2] = cramers_v
+                try:
+                    cramers_v = calculate_cramers_v(df_corr[col1], df_corr[col2])
+                    corr_matrix.loc[col1, col2] = cramers_v
+                except ValueError:
+                    corr_matrix.loc[col1, col2] = np.nan
             else:
                 # Use Pearson correlation for numeric variables
                 corr_matrix.loc[col1, col2] = df_corr[col1].corr(df_corr[col2])
+    
+    # Convert correlation matrix to float
+    corr_matrix = corr_matrix.astype(float)
     
     # Plot correlation matrix
     plt.figure(figsize=(20, 16))
@@ -85,37 +94,6 @@ def plot_correlation_matrix(df):
 #
 # if __name__ == "__main__":
 #     main()
-
-def plot_sales_by_account_type(df):
-    """
-    Plot the distribution of sales by account type.
-    """
-    # Ensure columns are in lowercase and clean them
-    df = df.copy()
-    df.columns = df.columns.str.strip().str.lower()
-
-    # Check if required columns are present
-    if 'acctype' not in df.columns or 'sales' not in df.columns:
-        st.warning("Columns 'acctype' and 'sales' are required for this plot.")
-        return
-
-    # Convert 'sales' to numeric and drop NaNs
-    df['sales'] = pd.to_numeric(df['sales'], errors='coerce')
-    df = df.dropna(subset=['acctype', 'sales'])
-
-    # Optionally handle outliers
-    df['sales'] = df['sales'].clip(lower=df['sales'].quantile(0.01), upper=df['sales'].quantile(0.99))
-
-    # Plot with logarithmic scale for better visualization
-    plt.figure(figsize=(8, 6))
-    sns.boxplot(x='acctype', y='sales', data=df)
-    plt.yscale('log')  # Apply log scale to Y-axis
-    plt.title("Sales Distribution by Account Type (Log Scale)")
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    st.pyplot(plt)
-
-
 def plot_sales_trend(df):
     """
     Plot the monthly sales trend over time with competitor entries.
