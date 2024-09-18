@@ -26,9 +26,9 @@ if sheet_id:
         
         # Plot correlation matrix
         if st.sidebar.button("Plot Correlation Matrix"):
-            st.subheader('Correlation Matrix')
-            st.write("Attempting to plot correlation matrix...")
-            try:
+           st.write("Correlation Matrix button clicked")  # Debugging button click
+           st.subheader('Correlation Matrix')
+           try:
                 plot_correlation_matrix(df_cleaned)
                 st.write("Correlation matrix plotted successfully!")
             except Exception as e:
