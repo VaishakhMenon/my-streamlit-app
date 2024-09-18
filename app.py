@@ -1,7 +1,7 @@
 import streamlit as st
 from data_cleaning import clean_data
 from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_trend
-from pyairtable import Table
+from pyairtable import Api  # Use Api or Base as per your preference
 import pandas as pd
 
 # Title of the Streamlit app
@@ -30,8 +30,11 @@ if airtable_token and base_id and table_name:
 
     if st.sidebar.button("Load and Clean Data"):
         try:
-            # Initialize the Airtable Table
-            table = Table(airtable_token, base_id, table_name)
+            # Initialize the Api object
+            api = Api(airtable_token)
+
+            # Get the Table object
+            table = api.table(base_id, table_name)
 
             # Fetch all records from the Airtable table
             records = table.all()
@@ -42,7 +45,7 @@ if airtable_token and base_id and table_name:
             # Convert the data into a DataFrame
             df = pd.DataFrame(data)
 
-            # Clean the data using the updated function
+            # Clean the data using your existing function
             df_cleaned = clean_data(df)
 
             st.write("Data types:")
@@ -63,19 +66,3 @@ if airtable_token and base_id and table_name:
             st.error(f"Error cleaning data or performing analysis: {e}")
 else:
     st.info("Please provide your Airtable credentials to load and clean data.")
-
-# Analysis options
-st.sidebar.header("Analysis")
-if st.sidebar.button("Plot Correlation Matrix"):
-    plot_correlation_matrix(df_cleaned)
-
-if st.sidebar.button("Plot Sales by Account Type"):
-    plot_sales_by_account_type(df_cleaned)
-
-if st.sidebar.button("Plot Sales Trend"):
-    plot_sales_trend(df_cleaned)
-
-if st.sidebar.button("Perform Regression Analysis"):
-    perform_regression(df_cleaned)
-
-
