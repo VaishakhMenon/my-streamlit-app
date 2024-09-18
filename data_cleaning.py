@@ -1,5 +1,5 @@
 import pandas as pd
-import numpy as np  # Importing NumPy for handling numeric data
+import numpy as np
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import streamlit as st
@@ -42,14 +42,12 @@ def clean_data(sheet_id):
     """
     df = load_data_from_google_sheets(sheet_id)
 
-    # Drop problematic unnamed columns or index columns
-    if 'sl' in df.columns:
-        df = df.drop(columns=['sl'])
-    if '0' in df.columns:
-        df = df.drop(columns=['0'])
+    # Drop the first column if it's unnamed or problematic (e.g., '0', 'sl', etc.)
+    if df.columns[0] == '' or df.columns[0] == '0':
+        df = df.drop(df.columns[0], axis=1)
 
     # Convert all object-type columns to strings to avoid serialization issues
-    df = df.astype(str)  # Use astype(str) to ensure object-type columns are treated as strings
+    df = df.astype(str)  # Convert object columns to strings
 
     # Ensure 'month' column is datetime
     if 'month' in df.columns:
@@ -64,7 +62,7 @@ def clean_data(sheet_id):
     for col in numeric_columns:
         df[col] = pd.to_numeric(df[col], errors='coerce')  # Convert to numeric, coerce errors to NaN
 
-    # Ensure there are no issues with object types or NaN values
+    # Handle any remaining NaN values in numeric columns
     df = df.dropna(subset=numeric_columns, how='all')  # Drop rows where all numeric columns are NaN
 
     return df
