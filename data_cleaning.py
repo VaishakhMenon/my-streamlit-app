@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np  # Importing NumPy for handling numeric data
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import streamlit as st
@@ -57,13 +58,14 @@ def clean_data(sheet_id):
     # Drop rows where 'month' could not be parsed to a valid datetime
     df = df.dropna(subset=['month'])
 
-    # Convert other relevant columns to numeric types if necessary
-    numeric_columns = ['sales', 'strategy1', 'strategy2', 'strategy3']
+    # Convert other relevant columns to numeric types while retaining 0 values
+    numeric_columns = ['sales', 'strategy1', 'strategy2', 'strategy3', 'qty']
+    
     for col in numeric_columns:
-        df[col] = pd.to_numeric(df[col], errors='coerce')
+        df[col] = pd.to_numeric(df[col], errors='coerce')  # Use NumPy to convert to numeric (coerce invalid values)
 
-    # Keep 0 values but drop rows where all numeric columns are NaN
-    df = df.dropna(subset=numeric_columns, how='all')
+    # Handle any remaining NaN values in numeric columns (retain 0 but drop NaNs)
+    df = df.dropna(subset=numeric_columns, how='all')  # Drop rows where all numeric columns are NaN
 
     return df
 
