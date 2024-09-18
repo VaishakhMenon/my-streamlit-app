@@ -1,5 +1,3 @@
-# regression.py
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,8 +12,14 @@ def perform_regression(df):
     """
     st.header("Scatter Plots with Inferences")
 
-    # Ensure that sales is numeric
+    # Ensure 'sales' and strategies are numeric, and coerce any invalid values
     df['sales'] = pd.to_numeric(df['sales'], errors='coerce')
+    df['strategy1'] = pd.to_numeric(df['strategy1'], errors='coerce')
+    df['strategy2'] = pd.to_numeric(df['strategy2'], errors='coerce')
+    df['strategy3'] = pd.to_numeric(df['strategy3'], errors='coerce')
+
+    # Drop rows with missing values in these columns
+    df = df.dropna(subset=['sales', 'strategy1', 'strategy2', 'strategy3'])
 
     # Define predefined features to compare with sales
     features = ['strategy1', 'strategy2', 'strategy3']
