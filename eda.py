@@ -1,3 +1,4 @@
+import pandas as pd  # Add this line if pandas is not imported
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
