@@ -3,12 +3,6 @@ from data_cleaning import clean_data
 from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_trend
 from pyairtable import Api
 import pandas as pd
-import sys
-
-st.write(f"Python version: {sys.version}")
-
-st.write(f"Streamlit version: {st.__version__}")
-
 
 # Title of the Streamlit app
 st.title("Airtable Data Analysis App")
@@ -29,6 +23,10 @@ else:
     airtable_token = st.sidebar.text_input("Enter your Airtable API Token:", "")
     base_id = st.sidebar.text_input("Enter your Airtable Base ID:", "")
     table_name = st.sidebar.text_input("Enter your Airtable Table Name:", "")
+
+# Initialize session state for the data if not already set
+if 'df_cleaned' not in st.session_state:
+    st.session_state.df_cleaned = None
 
 # Load data from Airtable
 if airtable_token and base_id and table_name:
@@ -54,6 +52,9 @@ if airtable_token and base_id and table_name:
             # Clean the data using your existing function
             df_cleaned = clean_data(df)
 
+            # Store the cleaned data in session state
+            st.session_state.df_cleaned = df_cleaned
+
             # Display data types
             st.write("Data Types of Cleaned DataFrame:")
             st.write(df_cleaned.dtypes)
@@ -62,18 +63,30 @@ if airtable_token and base_id and table_name:
             st.write("Cleaned Data:")
             st.dataframe(df_cleaned)
 
-            # Analysis options
-            st.sidebar.header("Analysis")
-            if st.sidebar.button("Plot Correlation Matrix"):
-                plot_correlation_matrix(df_cleaned)
-
-            if st.sidebar.button("Plot Sales by Account Type"):
-                plot_sales_by_account_type(df_cleaned)
-
-            if st.sidebar.button("Plot Sales Trend"):
-                plot_sales_trend(df_cleaned)
-
         except Exception as e:
-            st.error(f"Error cleaning data or performing analysis: {e}")
+            st.error(f"Error loading or cleaning data: {e}")
+
+    # Analysis options
+    if st.session_state.df_cleaned is not None:
+        st.sidebar.header("Analysis")
+        if st.sidebar.button("Plot Correlation Matrix"):
+            try:
+                plot_correlation_matrix(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error plotting correlation matrix: {e}")
+
+        if st.sidebar.button("Plot Sales by Account Type"):
+            try:
+                plot_sales_by_account_type(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error plotting sales by account type: {e}")
+
+        if st.sidebar.button("Plot Sales Trend"):
+            try:
+                plot_sales_trend(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error plotting sales trend: {e}")
+    else:
+        st.info("Please load and clean data before performing analysis.")
 else:
     st.info("Please provide your Airtable credentials to load and clean data.")
