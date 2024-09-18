@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from data_cleaning import clean_data  # Remove check_mixed_types import
+from data_cleaning import clean_data, check_mixed_types  # Import the check_mixed_types function
 from eda import plot_correlation_matrix
 from regression import perform_regression
 from utils import load_data_from_google_sheets
@@ -18,14 +18,9 @@ if sheet_id:
         st.write("Cleaned Data:")
         st.write(df_cleaned.head())
         
-        # Show the data types for further analysis
-        st.write("Data Types of Cleaned DataFrame:")
-        st.write(df_cleaned.dtypes)
-        
-        # Call the debugging function to check for mixed types in object columns
-        st.write("Checking for mixed types in object columns...")
+        # Check for mixed data types in the cleaned data
         check_mixed_types(df_cleaned)
-        
+
         # Sidebar options after data is loaded and cleaned
         st.sidebar.header("Analysis")
         
