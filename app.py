@@ -22,11 +22,14 @@ if sheet_id:
         if df_cleaned is None or df_cleaned.empty:
             st.error("Failed to load or clean data. Please check the Google Sheet ID and ensure data is valid.")
         else:
+            # Drop the first column, assuming it's irrelevant (like an index column or unnamed column)
+            df_cleaned = df_cleaned.iloc[:, 1:]  # Keep all columns except the first one
+            
             # Drop any completely empty or irrelevant columns
             df_cleaned = df_cleaned.dropna(axis=1, how='all')  # Drop columns with all NaN values
 
             # Display cleaned data without forced type conversion
-            st.write("Cleaned Data (without forced type conversion):")
+            st.write("Cleaned Data (ignoring the first column):")
             
             try:
                 # Display the first few rows of the cleaned data
