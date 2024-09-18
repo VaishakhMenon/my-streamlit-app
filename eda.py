@@ -1,41 +1,67 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import streamlit as st
+import seaborn as sns
+import matplotlib.pyplot as plt
+from scipy import stats as ss
+
+def calculate_cramers_v(x, y):
+    """Calculate Cramer's V statistic for categorical-categorical association."""
+    confusion_matrix = pd.crosstab(x, y)
+    chi2 = ss.chi2_contingency(confusion_matrix)[0]
+    n = confusion_matrix.sum().sum()
+    min_dim = min(confusion_matrix.shape) - 1
+    return np.sqrt(chi2 / (n * min_dim))
 
 def plot_correlation_matrix(df):
     """
-    Plot a correlation matrix for numerical variables in the dataset.
+    Plot a correlation matrix for all variables in the dataset, including categorical ones.
     """
-    # Define the potential columns for correlation analysis
-    possible_corr_columns = [
-        'accsize', 'acctargets', 'district', 'sales', 'qty', 'strategy1', 
-        'strategy2', 'strategy3', 'salesvisit1', 'salesvisit2', 'salesvisit3', 
-        'salesvisit4', 'salesvisit5', 'compbrand'
+    # List of all columns we want to include
+    all_columns = [
+        'accid', 'acctype', 'accsize', 'acctargets', 'district', 'sales', 'qty',
+        'strategy1', 'strategy2', 'strategy3', 'salesvisit1', 'salesvisit2',
+        'salesvisit3', 'salesvisit4', 'salesvisit5', 'compbrand'
     ]
     
     # Filter to only the columns that exist in the DataFrame
-    available_corr_columns = [col for col in possible_corr_columns if col in df.columns]
+    available_columns = [col for col in all_columns if col in df.columns]
     
-    if not available_corr_columns:
+    if not available_columns:
         st.warning("No columns available for correlation matrix.")
         return
     
     # Create a copy of the DataFrame with only the available columns
-    df_corr = df[available_corr_columns].copy()
+    df_corr = df[available_columns].copy()
     
-    # Convert columns to numeric, coercing errors to NaN
+    # Function to convert to numeric if possible, otherwise to categorical
+    def to_numeric_or_categorical(column):
+        try:
+            return pd.to_numeric(column)
+        except ValueError:
+            return column.astype('category')
+    
+    # Apply the conversion function to each column
     for col in df_corr.columns:
-        df_corr[col] = pd.to_numeric(df_corr[col], errors='coerce')
+        df_corr[col] = to_numeric_or_categorical(df_corr[col])
     
-    # Calculate correlation matrix
-    corr_matrix = df_corr.corr(method='pearson', min_periods=1)
+    # Create a correlation matrix
+    corr_matrix = pd.DataFrame(index=df_corr.columns, columns=df_corr.columns)
+    
+    for col1 in df_corr.columns:
+        for col2 in df_corr.columns:
+            if df_corr[col1].dtype.name == 'category' or df_corr[col2].dtype.name == 'category':
+                # Use Cramer's V for categorical variables
+                cramers_v = calculate_cramers_v(df_corr[col1], df_corr[col2])
+                corr_matrix.loc[col1, col2] = cramers_v
+            else:
+                # Use Pearson correlation for numeric variables
+                corr_matrix.loc[col1, col2] = df_corr[col1].corr(df_corr[col2])
     
     # Plot correlation matrix
-    plt.figure(figsize=(15, 12))
+    plt.figure(figsize=(20, 16))
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', linewidths=0.5, fmt='.2f', square=True)
-    plt.title("Correlation Matrix of Available Key Metrics")
+    plt.title("Correlation Matrix of All Key Metrics")
     plt.tight_layout()
     st.pyplot(plt)
     
@@ -43,16 +69,22 @@ def plot_correlation_matrix(df):
     st.write("Correlation Matrix:")
     st.write(corr_matrix)
     
-    # Display information about missing values
-    st.write("Missing values in each column:")
-    st.write(df_corr.isnull().sum())
-    
-    # Display data types of each column
-    st.write("Data types of each column:")
-    st.write(df_corr.dtypes)
+    # Display information about data types and unique values
+    st.write("Data types and unique values of each column:")
+    for col in df_corr.columns:
+        st.write(f"{col}: {df_corr[col].dtype.name}, Unique values: {df_corr[col].nunique()}")
 
-# Example usage:
-# plot_correlation_matrix(your_dataframe)
+# Example usage (you can comment this out if you're importing these functions elsewhere)
+# def main():
+#     st.title("Correlation Analysis")
+#
+#     # Assume df is your cleaned dataframe
+#     # df = clean_data(your_original_dataframe)
+#     
+#     plot_correlation_matrix(df)
+#
+# if __name__ == "__main__":
+#     main()
 
 def plot_sales_by_account_type(df):
     """
