@@ -42,14 +42,14 @@ def clean_data(sheet_id):
     """
     df = load_data_from_google_sheets(sheet_id)
 
-    # Drop columns that might be problematic, such as unnamed columns or index columns
+    # Drop problematic unnamed columns or index columns
     if 'sl' in df.columns:
         df = df.drop(columns=['sl'])
     if '0' in df.columns:
         df = df.drop(columns=['0'])
 
-    # Ensure all object-type columns are converted to strings to avoid serialization issues
-    df = df.applymap(lambda x: str(x) if isinstance(x, (str, int, float)) else x)
+    # Convert all object-type columns to strings to avoid serialization issues
+    df = df.astype(str)  # Use astype(str) to ensure object-type columns are treated as strings
 
     # Ensure 'month' column is datetime
     if 'month' in df.columns:
@@ -58,13 +58,13 @@ def clean_data(sheet_id):
     # Drop rows where 'month' could not be parsed to a valid datetime
     df = df.dropna(subset=['month'])
 
-    # Convert other relevant columns to numeric types while retaining 0 values
+    # Convert relevant columns to numeric types while retaining 0 values
     numeric_columns = ['sales', 'strategy1', 'strategy2', 'strategy3', 'qty']
     
     for col in numeric_columns:
-        df[col] = pd.to_numeric(df[col], errors='coerce')  # Use NumPy to convert to numeric (coerce invalid values)
+        df[col] = pd.to_numeric(df[col], errors='coerce')  # Convert to numeric, coerce errors to NaN
 
-    # Handle any remaining NaN values in numeric columns (retain 0 but drop NaNs)
+    # Ensure there are no issues with object types or NaN values
     df = df.dropna(subset=numeric_columns, how='all')  # Drop rows where all numeric columns are NaN
 
     return df
