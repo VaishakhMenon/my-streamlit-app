@@ -6,16 +6,26 @@ def plot_correlation_matrix(df):
     """
     Plot a correlation matrix for numerical variables in the dataset.
     """
-    numerical_cols = df.select_dtypes(include='number').columns
-    if numerical_cols.empty:
+    # Attempt to convert all columns to numeric where possible
+    df_numeric = df.copy()
+    df_numeric = df_numeric.apply(pd.to_numeric, errors='coerce')
+
+    # Filter to only numeric columns
+    numeric_columns = df_numeric.select_dtypes(include=['float64', 'int64']).columns.tolist()
+
+    if not numeric_columns:
         st.warning("No numerical columns available for correlation matrix.")
         return
 
+    # Calculate correlation matrix
+    corr_matrix = df_numeric[numeric_columns].corr()
+
+    # Plot correlation matrix
     plt.figure(figsize=(10, 8))
-    corr_matrix = df[numerical_cols].corr()
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt='.2f')
     plt.title("Correlation Matrix")
-    st.pyplot(plt.gcf())
+    st.pyplot(plt)
+
 
 def plot_sales_by_account_type(df):
     """
