@@ -75,3 +75,7 @@ if st.sidebar.button("Plot Sales by Account Type"):
 if st.sidebar.button("Plot Sales Trend"):
     plot_sales_trend(df_cleaned)
 
+if st.sidebar.button("Perform Regression Analysis"):
+    perform_regression(df_cleaned)
+
+
