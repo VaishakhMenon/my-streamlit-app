@@ -42,6 +42,14 @@ if sheet_id:
                 st.subheader('Correlation Matrix')
                 plot_correlation_matrix(df_cleaned)
 
+            if st.sidebar.button("Plot Sales by Account Type"):
+                st.subheader('Sales Distribution by Account Type')
+                plot_sales_by_account_type(df_cleaned)
+
+            if st.sidebar.button("Plot Sales Trend"):
+                st.subheader('Monthly Sales Trend')
+                plot_sales_trend(df_cleaned)
+
             if st.sidebar.button("Run Regression"):
                 model, X_test, y_test = perform_regression(df_cleaned)
                 st.subheader("Regression Results")
