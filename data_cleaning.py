@@ -23,45 +23,43 @@ def clean_data(df):
         'salesvisit1', 'salesvisit2', 'salesvisit3', 'salesvisit4', 'salesvisit5'
     ]
 
-    # Convert existing numeric columns to float
+    # Convert existing numeric columns to float and handle infinities and NaNs
     for col in numeric_columns:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce')
             # Replace infinite values with NaN
-            df[col].replace([np.inf, -np.inf], np.nan, inplace=True)
+            df[col] = df[col].replace([np.inf, -np.inf], np.nan)
             # Fill NaN values with zero
-            df[col].fillna(0, inplace=True)
+            df[col] = df[col].fillna(0)
 
-    # Convert 'accid' column to string if it exists
+    # Convert 'accid' column to string if it exists and handle NaNs
     if 'accid' in df.columns:
         df['accid'] = df['accid'].astype(str)
         # Replace NaN with empty string
-        df['accid'].fillna('', inplace=True)
+        df['accid'] = df['accid'].fillna('')
 
     # Convert any remaining object columns to string and fill NaN with empty string
     object_columns = df.select_dtypes(include=['object']).columns
     for col in object_columns:
         df[col] = df[col].astype(str)
-        df[col].fillna('', inplace=True)
+        df[col] = df[col].fillna('')
 
     # Handle remaining columns
     for col in df.columns:
-        if df[col].dtype.kind in 'O':
-            # For object types, ensure there are no problematic values
+        if df[col].dtype.kind in 'O':  # Object types
             df[col] = df[col].astype(str)
-            df[col].fillna('', inplace=True)
-        elif df[col].dtype.kind in 'iufc':  # integer, unsigned, float, complex
-            # For numeric types, fill NaN with zero
+            df[col] = df[col].fillna('')
+        elif df[col].dtype.kind in 'iufc':  # Numeric types
             df[col] = df[col].fillna(0)
-        elif df[col].dtype == 'bool':
-            # For boolean types, fill NaN with False
+        elif df[col].dtype.kind == 'b':  # Boolean types
             df[col] = df[col].fillna(False)
-        elif df[col].dtype.kind == 'M':  # datetime
-            # For datetime types, fill NaT with a default date or drop if necessary
+        elif df[col].dtype.kind == 'M':  # Datetime types
             df[col] = df[col].fillna(pd.Timestamp('1970-01-01'))
         else:
-            # Convert other types to string
             df[col] = df[col].astype(str)
-            df[col].fillna('', inplace=True)
+            df[col] = df[col].fillna('')
+
+    # Ensure there are no remaining NaN values
+    df = df.fillna('')
 
     return df
