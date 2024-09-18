@@ -8,8 +8,24 @@ def load_data_from_google_sheets(sheet_id):
     """
     # Define the scope and authorize the credentials
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("credentials/digital-river-319418-9cdcda1df227.json", scope)
+   
+    # Access secrets stored in Streamlit
+    google_creds = {
+        "type": st.secrets["google_api"]["type"],
+        "project_id": st.secrets["google_api"]["project_id"],
+        "private_key_id": st.secrets["google_api"]["private_key_id"],
+        "private_key": st.secrets["google_api"]["private_key"].replace('\\n', '\n'),  # Handle line breaks in the private key
+        "client_email": st.secrets["google_api"]["client_email"],
+        "client_id": st.secrets["google_api"]["client_id"],
+        "auth_uri": st.secrets["google_api"]["auth_uri"],
+        "token_uri": st.secrets["google_api"]["token_uri"],
+        "auth_provider_x509_cert_url": st.secrets["google_api"]["auth_provider_x509_cert_url"],
+        "client_x509_cert_url": st.secrets["google_api"]["client_x509_cert_url"]
+    }
+
     
+    # Authenticate and initialize the gspread client using credentials from Streamlit Secrets
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(google_creds, scope)
     client = gspread.authorize(creds)
 
     # Open the Google Sheet by ID
@@ -64,7 +80,7 @@ def clean_data(sheet_id):
     return df
 
 # Example usage
-sheet_id = '1JCzLJ7TmCOXyj3zjbhhSCIWd-p59jyeWfir11kfQg_0'  # Replace with your actual Google Sheet ID
+sheet_id = '1JCzLJ7TmCOXyj3zjbhhSCIWd-p59jyeWfir11kfQg_0'  
 cleaned_df = clean_data(sheet_id)
 
 # View the cleaned data
