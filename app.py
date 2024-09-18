@@ -31,7 +31,7 @@ if sheet_id:
            try:
                 plot_correlation_matrix(df_cleaned)
                 st.write("Correlation matrix plotted successfully!")
-            except Exception as e:
+                except Exception as e:
                 st.error(f"Error plotting correlation matrix: {str(e)}")
         
         # Run regression
