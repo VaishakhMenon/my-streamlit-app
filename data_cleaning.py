@@ -29,6 +29,18 @@ def load_data_from_google_sheets(sheet_id):
 
     return df
 
+def check_mixed_types(df):
+    """
+    Check if there are columns with mixed types in the DataFrame and print the problematic rows.
+    """
+    mixed_columns = []
+    for col in df.columns:
+        if df[col].apply(lambda x: isinstance(x, str)).any() and df[col].apply(lambda x: pd.api.types.is_numeric_dtype(type(x))).any():
+            mixed_columns.append(col)
+            st.write(f"Column '{col}' contains mixed types.")
+    
+    return mixed_columns
+
 def clean_data(sheet_id):
     """
     Clean the dataset by removing unnecessary rows and ensuring proper data types.
@@ -47,6 +59,9 @@ def clean_data(sheet_id):
     # Drop rows where 'month' could not be parsed
     df = df.dropna(subset=['month'])
 
+    # Check for mixed types in columns
+    mixed_columns = check_mixed_types(df)
+    
     # Downcast int64 columns to int32
     for col in df.select_dtypes(include='int64').columns:
         df[col] = pd.to_numeric(df[col], downcast='integer')
@@ -60,12 +75,3 @@ def clean_data(sheet_id):
     st.write(df.dtypes)
 
     return df
-
-# Example usage
-sheet_id = '1JCzLJ7TmCOXyj3zjbhhSCIWd-p59jyeWfir11kfQg_0'  
-cleaned_df = clean_data(sheet_id)
-
-# View the cleaned data
-if cleaned_df is not None:
-    st.write("Cleaned Data:")
-    st.write(cleaned_df.head())
