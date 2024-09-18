@@ -1,8 +1,8 @@
 streamlit==1.26.0
-pandas
-pyairtable>=1.0.0
-matplotlib
-seaborn
-scikit-learn
-numpy
+pandas==1.5.3
+pyairtable==1.0.0
+matplotlib==3.7.1
+seaborn==0.12.2
+scikit-learn==1.2.2
+numpy==1.24.3
 statsmodels
