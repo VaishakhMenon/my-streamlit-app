@@ -3,6 +3,9 @@ from data_cleaning import clean_data
 from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_trend
 from pyairtable import Api
 import pandas as pd
+import sys
+
+st.write(f"Python version: {sys.version}")
 
 st.write(f"Streamlit version: {st.__version__}")
 
