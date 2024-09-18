@@ -59,9 +59,15 @@ def clean_data(sheet_id):
     # Drop rows where 'month' could not be parsed
     df = df.dropna(subset=['month'])
 
-    # Convert the 'Sl' column (or first unnamed column) explicitly to string
-    if 'sl' in df.columns:
-        df['sl'] = df['sl'].astype(str)
+    # Convert the first column (Sl or unnamed) to string explicitly
+    if df.columns[0]:
+        df[df.columns[0]] = df[df.columns[0]].astype('string')
+
+    # Handle null values in the first column
+    df[df.columns[0]] = df[df.columns[0]].fillna('')
+
+    # Apply standardization of mixed data types
+    df[df.columns[0]] = df[df.columns[0]].apply(lambda x: str(x) if pd.notnull(x) else x)
 
     # Convert object columns to strings if applicable
     for col in df.select_dtypes(include='object').columns:
@@ -72,4 +78,5 @@ def clean_data(sheet_id):
     st.write(df.dtypes)
 
     return df
+
 
