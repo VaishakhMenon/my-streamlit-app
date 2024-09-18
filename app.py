@@ -10,9 +10,8 @@ Original file is located at
 import streamlit as st
 import pandas as pd
 from data_cleaning import clean_data
-from eda import plot_correlation_matrix
+from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_trend
 from regression import perform_regression
-from utils import load_data_from_google_sheets
 
 # Sidebar for Google Sheet ID input
 st.sidebar.header("Google Sheets Input")
@@ -38,7 +37,14 @@ if sheet_id:
             try:
                 # Attempt to fix column types if there are any issues
                 df_cleaned = df_cleaned.convert_dtypes()  # Automatically converts to best possible dtypes
+                
+                # Display the first few rows of the cleaned data
                 st.write(df_cleaned.head())
+                
+                # Display data types of each column for debugging purposes
+                st.write("Data types of cleaned DataFrame:")
+                st.write(df_cleaned.dtypes)
+                
             except Exception as e:
                 st.error(f"Error processing data: {e}")
 
@@ -64,3 +70,4 @@ if sheet_id:
                 st.write(f"Intercept: {model.intercept_}")
 else:
     st.write("Please enter a Google Sheet ID to load and clean data.")
+
