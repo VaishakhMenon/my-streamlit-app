@@ -20,6 +20,27 @@ def calculate_efficiency(df):
 
     return efficiency_strategy1, efficiency_strategy2, efficiency_strategy3
 
+def display_efficiency_table(df):
+    """
+    Display the calculated efficiency scores of each strategy in a table.
+    """
+    efficiency_strategy1, efficiency_strategy2, efficiency_strategy3 = calculate_efficiency(df)
+
+    efficiency_data = {
+        'Strategy': ['Strategy 1', 'Strategy 2', 'Strategy 3'],
+        'Efficiency (Sales per Dollar Spent)': [
+            efficiency_strategy1.sum(),
+            efficiency_strategy2.sum(),
+            efficiency_strategy3.sum()
+        ]
+    }
+
+    efficiency_df = pd.DataFrame(efficiency_data)
+
+    # Display the efficiency table
+    st.subheader("Efficiency of Each Strategy")
+    st.table(efficiency_df)
+
 def simulate_strategy_reallocation(df):
     """
     Simulate reallocating resources from the least efficient strategy to the more efficient ones.
@@ -94,6 +115,9 @@ def simulate_switching_costs(df):
 
 def simulate_reallocation_and_switching_costs(df):
     st.header("Simulate Strategy Reallocation and Switching Costs")
+    
+    # Display Efficiency Table First
+    display_efficiency_table(df)
     
     st.subheader("1. Strategy Reallocation")
     simulate_strategy_reallocation(df)
