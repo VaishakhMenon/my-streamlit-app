@@ -7,6 +7,7 @@ from time_series_analysis import analyze_time_series
 from market_segmentation import perform_segmentation
 from competitor_analysis import analyze_competitors
 from future_budget import forecast_budget
+from dollar_value_sales import calculate_dollar_value_sales
 from simulate_reallocation_and_switching_cost import simulate_reallocation_and_switching_costs
 
 # Title of the Streamlit app
@@ -19,56 +20,106 @@ st.sidebar.header("Airtable Input")
 use_secrets = st.sidebar.checkbox("Use credentials from secrets", value=True)
 
 if use_secrets:
+    # Access Airtable credentials from Streamlit secrets
     airtable_token = st.secrets["airtable"]["token"]
     base_id = st.secrets["airtable"]["base_id"]
     table_name = st.secrets["airtable"]["table_name"]
 else:
+    # Manual input for Airtable credentials
     airtable_token = st.sidebar.text_input("Enter your Airtable API Token:", "")
     base_id = st.sidebar.text_input("Enter your Airtable Base ID:", "")
     table_name = st.sidebar.text_input("Enter your Airtable Table Name:", "")
 
+# Initialize session state for the data if not already set
 if 'df_cleaned' not in st.session_state:
     st.session_state.df_cleaned = None
 
+# Load data from Airtable
 if airtable_token and base_id and table_name:
     st.sidebar.header("Data Processing")
-    
+
     if st.sidebar.button("Load and Clean Data"):
         try:
+            # Load and clean the data from Airtable using the utility function
             df_cleaned = load_and_clean_data_from_airtable(airtable_token, base_id, table_name)
+
+            # Store the cleaned data in session state
             st.session_state.df_cleaned = df_cleaned
-            st.write("Cleaned Data:", df_cleaned.head())
+
+            # Display data types
+            st.write("Data Types of Cleaned DataFrame:")
+            st.write(df_cleaned.dtypes)
+
+            # Display the cleaned DataFrame
+            st.write("Cleaned Data:")
+            st.dataframe(df_cleaned)
+
         except Exception as e:
             st.error(f"Error loading or cleaning data: {e}")
 
+    # Analysis options
     if st.session_state.df_cleaned is not None:
         st.sidebar.header("Analysis")
         
         if st.sidebar.button("Plot Correlation Matrix"):
-            plot_correlation_matrix(st.session_state.df_cleaned)
-        
+            try:
+                plot_correlation_matrix(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error plotting correlation matrix: {e}")
+
         if st.sidebar.button("Plot Sales by Account Type"):
-            plot_sales_by_account_type(st.session_state.df_cleaned)
+            try:
+                plot_sales_by_account_type(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error plotting sales by account type: {e}")
 
         if st.sidebar.button("Plot Sales Trend"):
-            plot_sales_trend(st.session_state.df_cleaned)
+            try:
+                plot_sales_trend(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error plotting sales trend: {e}")
 
         if st.sidebar.button("Run Regression Analysis"):
-            perform_regression(st.session_state.df_cleaned)
+            try:
+                perform_regression(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error performing regression analysis: {e}")
+
+        if st.sidebar.button("Dollar Value of Sales"):
+            try:
+                calculate_dollar_value_sales(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error calculating dollar value of sales: {e}")
+
+        if st.sidebar.button("Reallocation & Switching Costs"):
+            try:
+                simulate_reallocation_and_switching_costs(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error simulating reallocation and switching costs: {e}")
 
         if st.sidebar.button("Time Series Analysis"):
-            analyze_time_series(st.session_state.df_cleaned)
+            try:
+                analyze_time_series(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error performing time series analysis: {e}")
 
         if st.sidebar.button("Market Segmentation"):
-            perform_segmentation(st.session_state.df_cleaned)
+            try:
+                perform_segmentation(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error performing market segmentation: {e}")
 
         if st.sidebar.button("Competitor Analysis"):
-            analyze_competitors(st.session_state.df_cleaned)
+            try:
+                analyze_competitors(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error performing competitor analysis: {e}")
 
         if st.sidebar.button("Future Budget Allocation"):
-            forecast_budget(st.session_state.df_cleaned)
+            try:
+                forecast_budget(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error performing future budget analysis: {e}")
 
-        if st.sidebar.button("Simulate Reallocation and Switching Costs"):
-            simulate_reallocation_and_switching_costs(st.session_state.df_cleaned)
 else:
     st.info("Please provide your Airtable credentials to load and clean data.")
