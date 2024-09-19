@@ -5,45 +5,43 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from scipy import stats
 
-def remove_outliers(df, columns):
+def convert_to_numeric(df, columns):
     """
-    Removes rows with outliers based on Z-scores for the specified columns.
+    Convert the specified columns to numeric and handle non-numeric values.
     """
     for col in columns:
         if col in df.columns:
-            # Ensure the column is numeric before computing Z-scores
             df[col] = pd.to_numeric(df[col], errors='coerce')
-            z_scores = np.abs(stats.zscore(df[col].dropna()))
-            df = df[(z_scores < 3).reindex(df.index, fill_value=True)]  # Keep rows with valid Z-scores
+    return df
+
+def clean_categorical_columns(df, categorical_columns):
+    """
+    Convert categorical columns to numeric (using one-hot encoding or label encoding).
+    """
+    for col in categorical_columns:
+        if col in df.columns:
+            df[col] = df[col].astype('category').cat.codes  # Label encoding
     return df
 
 def plot_correlation_matrix(df):
     """
-    Plot a correlation matrix for numerical variables in the dataset, excluding categorical columns like 'district'.
+    Plot a correlation matrix for all variables in the dataset, including those converted to numeric.
     """
-    # Select only numeric columns for correlation matrix (excluding 'district')
-    numeric_columns = [
-        'accsize', 'acctargets', 'sales', 'qty', 'strategy1', 'strategy2', 
-        'strategy3', 'salesvisit1', 'salesvisit2', 'salesvisit3', 'salesvisit4', 
-        'salesvisit5', 'compbrand'
-    ]
-    
-    # Filter out columns that don't exist in the DataFrame
-    available_columns = [col for col in numeric_columns if col in df.columns]
-    
-    if not available_columns:
-        st.warning("No numerical columns available for correlation matrix.")
-        return
-    
-    # Ensure the selected columns are numeric, convert where necessary
-    for col in available_columns:
-        df[col] = pd.to_numeric(df[col], errors='coerce')
-    
-    # Remove rows with missing or NaN values in the selected columns
-    df_cleaned = df[available_columns].dropna()
+    # List of columns to include in the correlation matrix
+    numeric_columns = ['accsize', 'acctargets', 'sales', 'qty', 'strategy1', 'strategy2', 
+                       'strategy3', 'salesvisit1', 'salesvisit2', 'salesvisit3', 
+                       'salesvisit4', 'salesvisit5', 'compbrand', 'quantity']
 
-    # Remove outliers for key columns like 'sales' and 'qty'
-    df_cleaned = remove_outliers(df_cleaned, ['sales', 'qty'])
+    categorical_columns = ['accid', 'acctype', 'compbrand']
+
+    # Convert categorical columns to numeric
+    df = clean_categorical_columns(df, categorical_columns)
+
+    # Ensure numeric conversion for selected columns
+    df = convert_to_numeric(df, numeric_columns + categorical_columns)
+
+    # Remove rows with missing or NaN values in the selected columns
+    df_cleaned = df[numeric_columns].dropna()
 
     # Calculate the correlation matrix
     corr_matrix = df_cleaned.corr()
@@ -51,8 +49,13 @@ def plot_correlation_matrix(df):
     # Plot the correlation matrix
     plt.figure(figsize=(14, 10))
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
-    plt.title('Correlation Matrix of Account Types, Strategies, Sales, Targets, Competitor Brands, and Quantity')
+    plt.title('Correlation Matrix of All Key Metrics')
+    plt.tight_layout()
     st.pyplot(plt)
+
+    # Display the correlation matrix as a table
+    st.write("Correlation Matrix:")
+    st.write(corr_matrix)
 
 def plot_sales_by_account_type(df):
     """
