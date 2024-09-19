@@ -141,12 +141,10 @@ if airtable_token and base_id and table_name:
 
         if st.sidebar.button("Calculate Average Marginal Impact"):
             try:
-                if 'model' in st.session_state:
-                    calculate_average_marginal_impact(st.session_state.df_cleaned, st.session_state.model)
-                else:
-                    st.warning("Please run the regression analysis first to create a model.")
+                calculate_average_marginal_impact(st.session_state.df_cleaned)
             except Exception as e:
                 st.error(f"Error calculating Average Marginal Impact: {e}")
+
 
 
 else:
