@@ -60,6 +60,14 @@ def perform_regression(df):
     """
     st.header("Segmented Strategy Regression Analysis")
 
+    # Ensure columns are in lowercase for consistency
+    df.columns = df.columns.str.strip().str.lower()
+
+    # Check if 'acctype' exists after cleaning
+    if 'acctype' not in df.columns:
+        st.error("The 'acctype' column is missing from the data after cleaning.")
+        return
+
     # Ensure 'sales' and strategies are numeric
     df['sales'] = pd.to_numeric(df['sales'], errors='coerce')
     df['strategy1'] = pd.to_numeric(df['strategy1'], errors='coerce')
@@ -69,10 +77,14 @@ def perform_regression(df):
     # Drop rows with missing values in these columns
     df = df.dropna(subset=['sales', 'strategy1', 'strategy2', 'strategy3'])
 
+    # Ensure 'acctype' has non-empty values
+    if df['acctype'].isnull().all():
+        st.warning("No valid 'acctype' data found after cleaning.")
+        return
+
     # Segment the data by account type
-    if 'acctype' in df.columns:
-        for segment_name in df['acctype'].unique():
-            segment_data = df[df['acctype'] == segment_name]
-            segmented_strategy_analysis(segment_data, segment_name)
-    else:
-        st.warning("Account type column 'acctype' not found in the data.")
+    for segment_name in df['acctype'].unique():
+        segment_data = df[df['acctype'] == segment_name]
+        segmented_strategy_analysis(segment_data, segment_name)
+
+
