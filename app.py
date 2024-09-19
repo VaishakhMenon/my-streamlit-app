@@ -87,7 +87,7 @@ if airtable_token and base_id and table_name:
 
         if st.sidebar.button("Dollar Value of Sales"):
             try:
-                calculate_dollar_value_sales(st.session_state.df_cleaned)
+                calculate_sales_from_strategy(st.session_state.df_cleaned)
             except Exception as e:
                 st.error(f"Error calculating dollar value of sales: {e}")
 
