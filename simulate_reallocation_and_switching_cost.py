@@ -2,21 +2,43 @@ import pandas as pd
 import altair as alt
 import streamlit as st
 
+import pandas as pd
+import streamlit as st
+
 def calculate_efficiency(df):
     """
     Calculate the efficiency of each strategy in terms of sales per dollar spent.
     """
+    # Ensure columns 'strategy1', 'strategy2', 'strategy3', and 'sales' exist
+    if 'strategy1' not in df.columns or 'strategy2' not in df.columns or 'strategy3' not in df.columns or 'sales' not in df.columns:
+        st.error("Required columns for efficiency calculation are missing.")
+        return None
+
+    # Calculate total spending (i.e., sum of each strategy)
     total_spending_strategy1 = df['strategy1'].sum()
     total_spending_strategy2 = df['strategy2'].sum()
     total_spending_strategy3 = df['strategy3'].sum()
 
-    total_sales_strategy1 = df['sales_from_strategy1'].sum()
-    total_sales_strategy2 = df['sales_from_strategy2'].sum()
-    total_sales_strategy3 = df['sales_from_strategy3'].sum()
+    # Calculate total sales generated from each strategy based on regression coefficients
+    # Assume we have already calculated these coefficients
+    coeff_strategy1 = 1.2  # Placeholder coefficient for strategy1 (replace with actual model output)
+    coeff_strategy2 = 1.5  # Placeholder coefficient for strategy2 (replace with actual model output)
+    coeff_strategy3 = 0.9  # Placeholder coefficient for strategy3 (replace with actual model output)
 
-    efficiency_strategy1 = total_sales_strategy1 / total_spending_strategy1
-    efficiency_strategy2 = total_sales_strategy2 / total_spending_strategy2
-    efficiency_strategy3 = total_sales_strategy3 / total_spending_strategy3
+    # Calculate sales generated from each strategy using coefficients
+    total_sales_strategy1 = df['strategy1'] * coeff_strategy1
+    total_sales_strategy2 = df['strategy2'] * coeff_strategy2
+    total_sales_strategy3 = df['strategy3'] * coeff_strategy3
+
+    # Calculate efficiency as total sales per dollar spent
+    efficiency_strategy1 = total_sales_strategy1.sum() / total_spending_strategy1
+    efficiency_strategy2 = total_sales_strategy2.sum() / total_spending_strategy2
+    efficiency_strategy3 = total_sales_strategy3.sum() / total_spending_strategy3
+
+    # Display the results
+    st.write("Efficiency of Strategy 1 (Sales per Dollar Spent): ${:,.2f}".format(efficiency_strategy1))
+    st.write("Efficiency of Strategy 2 (Sales per Dollar Spent): ${:,.2f}".format(efficiency_strategy2))
+    st.write("Efficiency of Strategy 3 (Sales per Dollar Spent): ${:,.2f}".format(efficiency_strategy3))
 
     return efficiency_strategy1, efficiency_strategy2, efficiency_strategy3
 
