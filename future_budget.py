@@ -14,9 +14,9 @@ def future_budget_forecasting():
     spending_strategy2 = 56_924_812  # SGD
     spending_strategy3 = 1_648_700  # SGD
 
-    total_sales_strategy1 = 749_703_582.20  # Total sales from Strategy 1 (SGD)
-    total_sales_strategy2 = 3_676_109_835.12  # Total sales from Strategy 2 (SGD)
-    total_sales_strategy3 = 52_375_297.77  # Total sales from Strategy 3 (SGD)
+    total_sales_strategy1 = 712_806_328.76  # Total sales from Strategy 1 (SGD)
+    total_sales_strategy2 = 3_667_628_376.09  # Total sales from Strategy 2 (SGD)
+    total_sales_strategy3 = 50_496_439.04  # Total sales from Strategy 3 (SGD)
 
     # Future budget allocations for Scenario 1 (in SGD)
     future_budget_strategy1 = 10_000_000  # Future budget for Strategy 1 (SGD)
@@ -113,13 +113,13 @@ def plot_weighted_budget_allocation():
     """
 
     # Example spending and sales based on previous analysis (in SGD)
-    total_sales_strategy1 = 749_703_582.20  # Example value
-    total_sales_strategy2 = 3_676_109_835.12  # Example value
-    total_sales_strategy3 = 52_375_297.77  # Example value
+    total_sales_strategy1 = 712_806_328.76  # Example value
+    total_sales_strategy2 = 3_667_628_376.09  # Example value
+    total_sales_strategy3 = 50_496_439.04  # Example value
 
-    efficiency_strategy1 = 75.60  # Example efficiency values
-    efficiency_strategy2 = 64.58
-    efficiency_strategy3 = 31.77
+    efficiency_strategy1 = 17.14  # Example efficiency values
+    efficiency_strategy2 = 13.41
+    efficiency_strategy3 = 8.23
 
     # Total future budget to allocate (SGD)
     total_future_budget = 40_000_000  # SGD
