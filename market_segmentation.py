@@ -1,73 +1,66 @@
-# segmentation.py
-
-import streamlit as st
-import pandas as pd
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
-import seaborn as sns
 import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+import streamlit as st
 
 def perform_segmentation(df):
     """
-    Perform market segmentation using K-Means clustering.
+    Segment the market by account types and analyze the sales performance with respect to 
+    the number of competitor brands. Visualize the relationship and correlation.
     """
-    st.header("Market Segmentation")
+    st.header("Market Segmentation by Account Type")
 
-    # Allow the user to select features for clustering
-    st.write("### Select Features for Clustering")
-    numeric_columns = df.select_dtypes(include=['float', 'int']).columns.tolist()
-
-    if not numeric_columns:
-        st.warning("No numeric columns available for clustering.")
-        return
-
-    selected_features = st.multiselect("Select features:", numeric_columns, default=numeric_columns)
-
-    if len(selected_features) < 2:
-        st.warning("Please select at least two features for clustering.")
-        return
-
-    # Select number of clusters
-    n_clusters = st.slider("Select number of clusters (k):", min_value=2, max_value=10, value=3, step=1)
-
-    # Prepare the data
-    X = df[selected_features].dropna()
-
-    # Standardize the data
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
-
-    # Apply K-Means clustering
-    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-    clusters = kmeans.fit_predict(X_scaled)
-
-    # Add cluster assignments to the DataFrame
-    df_clustered = df.copy()
-    df_clustered['Segment'] = clusters
-
-    # Display cluster centers
-    st.write("### Cluster Centers (in Original Scale):")
-    centers = pd.DataFrame(scaler.inverse_transform(kmeans.cluster_centers_), columns=selected_features)
-    st.dataframe(centers)
-
-    # Visualize clusters
-    st.write("### Cluster Visualization")
-    if len(selected_features) >= 2:
-        # Select features for x and y axes
-        x_axis = st.selectbox("Select feature for X-axis:", selected_features)
-        y_axis_options = [col for col in selected_features if col != x_axis]
+    # Ensure 'compBrand', 'sales', and 'accType' columns exist in the dataset
+    if 'compbrand' in df.columns and 'sales' in df.columns and 'acctype' in df.columns:
         
-        if y_axis_options:
-            y_axis = st.selectbox("Select feature for Y-axis:", y_axis_options)
+        # Group by account type and competitor brands, then calculate average sales
+        segmented_data = df.groupby(['acctype', 'compbrand'])['sales'].mean().reset_index()
 
-            # Plot the clusters
-            plt.figure(figsize=(10, 6))
-            sns.scatterplot(x=x_axis, y=y_axis, hue='Segment', data=df_clustered, palette='deep')
-            plt.title(f"K-Means Clustering with {n_clusters} Clusters")
-            plt.xlabel(x_axis)
-            plt.ylabel(y_axis)
-            st.pyplot(plt)
+        # Display the segmented data in Streamlit (optional, to check the structure)
+        st.write("Segmented Data (Average Sales by Account Type and Competitor Brands):")
+        st.dataframe(segmented_data)
 
-    # Show the clustered data
-    st.write("### Clustered Data")
-    st.dataframe(df_clustered)
+        # Calculate correlation between competitor brands and sales for each account type
+        correlations_by_accType = df.groupby('acctype').apply(
+            lambda x: x['compbrand'].corr(x['sales'])
+        ).reset_index()
+
+        # Rename columns for clarity
+        correlations_by_accType.columns = ['Account Type', 'Correlation']
+
+        # Display correlations in Streamlit
+        st.write("Correlation Between Competitor Brands and Sales by Account Type:")
+        st.dataframe(correlations_by_accType)
+
+        # Plot sales vs competitor brands for each account type
+        st.subheader("Sales vs Competitor Brands for Each Account Type")
+        plt.figure(figsize=(14, 8))
+
+        # Creating subplots for each account type
+        account_types = df['acctype'].unique()
+        for i, accType in enumerate(account_types, 1):
+            plt.subplot(2, 2, i)
+            subset = df[df['acctype'] == accType]
+            sns.scatterplot(data=subset, x='compbrand', y='sales', hue='compbrand', palette='coolwarm')
+            plt.title(f"Sales vs Competitor Brands for {accType}")
+            plt.xlabel("Number of Competitor Brands")
+            plt.ylabel("Sales (USD)")
+            plt.grid(True)
+
+        plt.tight_layout()
+        st.pyplot(plt)
+
+        # Bar plot of correlation by account type
+        st.subheader("Correlation Between Competitor Brands and Sales by Account Type")
+        plt.figure(figsize=(10, 6))
+        sns.barplot(data=correlations_by_accType, x='Account Type', y='Correlation', palette='Blues_d')
+        plt.title('Correlation Between Competitor Brands and Sales by Account Type')
+        plt.xlabel('Account Type')
+        plt.ylabel('Correlation')
+        plt.xticks(rotation=45)
+        plt.grid(True)
+        st.pyplot(plt)
+
+    else:
+        st.error("Required columns 'compbrand', 'sales', or 'acctype' are missing in the dataset.")
+
