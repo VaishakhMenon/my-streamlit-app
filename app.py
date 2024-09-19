@@ -3,7 +3,7 @@ import pandas as pd
 from data_cleaning import clean_data
 from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_trend
 from regression import perform_regression
-from time_series import analyze_time_series
+from time_series_analysis import analyze_time_series
 from segmentation import perform_segmentation
 from competitor_analysis import analyze_competitors
 from budgeting import forecast_budget
