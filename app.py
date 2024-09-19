@@ -1,5 +1,3 @@
-# app.py
-
 import streamlit as st
 import pandas as pd
 from utils import load_and_clean_data_from_airtable
@@ -9,6 +7,7 @@ from time_series_analysis import analyze_time_series
 from market_segmentation import perform_segmentation
 from competitor_analysis import analyze_competitors
 from future_budget import forecast_budget
+from dollar_value_sales import calculate_sales_from_strategy  # Import the new file
 
 # Title of the Streamlit app
 st.title("Airtable Data Analysis App")
@@ -108,6 +107,13 @@ if airtable_token and base_id and table_name:
                 forecast_budget(st.session_state.df_cleaned)
             except Exception as e:
                 st.error(f"Error performing future budget analysis: {e}")
+        
+        # New option to calculate sales from strategy
+        if st.sidebar.button("Calculate Sales from Strategy"):
+            try:
+                calculate_sales_from_strategy(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error calculating sales from strategy: {e}")
 
 else:
     st.info("Please provide your Airtable credentials to load and clean data.")
