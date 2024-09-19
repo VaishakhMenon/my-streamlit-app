@@ -48,6 +48,9 @@ def clean_data(df):
     
     # Handle 'accid' column as before (if required)
 
+    df = df[original_column_order]
+
+
     st.write("Data Types of Cleaned DataFrame:")
     st.write(df_cleaned.dtypes)
 
