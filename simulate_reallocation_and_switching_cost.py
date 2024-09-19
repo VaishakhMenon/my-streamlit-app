@@ -25,6 +25,27 @@ def calculate_efficiency(df):
 
     return efficiency_strategy1, efficiency_strategy2, efficiency_strategy3
 
+def display_efficiency_table(df):
+    """
+    Display the calculated efficiency scores of each strategy in a table.
+    """
+    efficiency_strategy1, efficiency_strategy2, efficiency_strategy3 = calculate_efficiency(df)
+
+    efficiency_data = {
+        'Strategy': ['Strategy 1', 'Strategy 2', 'Strategy 3'],
+        'Efficiency (Sales per Dollar Spent)': [
+            float(efficiency_strategy1),  # Convert to float to ensure scalar value
+            float(efficiency_strategy2),
+            float(efficiency_strategy3)
+        ]
+    }
+
+    efficiency_df = pd.DataFrame(efficiency_data)
+
+    # Display the efficiency table
+    st.subheader("Efficiency of Each Strategy")
+    st.table(efficiency_df)
+
 def simulate_strategy_reallocation(df):
     """
     Simulate reallocating resources from the least efficient strategy to the more efficient ones.
@@ -51,11 +72,11 @@ def simulate_strategy_reallocation(df):
     new_total_sales = new_sales_strategy1 + new_sales_strategy2
 
     # Display the results
-    st.write(f"New Total Sales after Reallocation: ${new_total_sales:,.2f}")
+    st.write(f"New Total Sales after Reallocation: ${float(new_total_sales):,.2f}")  # Convert to float
 
     reallocation_chart = pd.DataFrame({
         'Strategy': ['Strategy 1', 'Strategy 2', 'Total'],
-        'Sales': [new_sales_strategy1, new_sales_strategy2, new_total_sales]
+        'Sales': [float(new_sales_strategy1), float(new_sales_strategy2), float(new_total_sales)]  # Ensure scalar values
     })
 
     chart = alt.Chart(reallocation_chart).mark_bar().encode(
@@ -95,11 +116,11 @@ def simulate_switching_costs(df):
     # Calculate new total sales after switching costs
     new_total_sales_after_switching = new_sales_strategy1 + new_sales_strategy2 + original_sales_strategy1 + original_sales_strategy2
 
-    st.write(f"New Total Sales after Switching Costs: ${new_total_sales_after_switching:,.2f}")
+    st.write(f"New Total Sales after Switching Costs: ${float(new_total_sales_after_switching):,.2f}")  # Convert to float
 
     switching_cost_chart = pd.DataFrame({
         'Strategy': ['Strategy 1', 'Strategy 2', 'Total'],
-        'Sales': [new_sales_strategy1, new_sales_strategy2, new_total_sales_after_switching]
+        'Sales': [float(new_sales_strategy1), float(new_sales_strategy2), float(new_total_sales_after_switching)]  # Ensure scalar values
     })
 
     chart = alt.Chart(switching_cost_chart).mark_bar().encode(
@@ -112,6 +133,9 @@ def simulate_switching_costs(df):
 
 def simulate_reallocation_and_switching_costs(df):
     st.header("Simulate Strategy Reallocation and Switching Costs")
+    
+    # Display Efficiency Table First
+    display_efficiency_table(df)
     
     st.subheader("1. Strategy Reallocation")
     simulate_strategy_reallocation(df)
