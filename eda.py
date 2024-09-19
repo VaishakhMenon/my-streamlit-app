@@ -19,11 +19,11 @@ def remove_outliers(df, columns):
 
 def plot_correlation_matrix(df):
     """
-    Plot a correlation matrix for numerical variables in the dataset.
+    Plot a correlation matrix for numerical variables in the dataset, excluding categorical columns like 'district'.
     """
-    # Select only numeric columns for correlation matrix
+    # Select only numeric columns for correlation matrix (excluding 'district')
     numeric_columns = [
-        'accsize', 'acctargets', 'district', 'sales', 'qty', 'strategy1', 'strategy2', 
+        'accsize', 'acctargets', 'sales', 'qty', 'strategy1', 'strategy2', 
         'strategy3', 'salesvisit1', 'salesvisit2', 'salesvisit3', 'salesvisit4', 
         'salesvisit5', 'compbrand'
     ]
@@ -51,7 +51,7 @@ def plot_correlation_matrix(df):
     # Plot the correlation matrix
     plt.figure(figsize=(14, 10))
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
-    plt.title('Correlation Matrix of Account Types, Strategies, Sales, District, Targets, Competitor Brands, and Quantity')
+    plt.title('Correlation Matrix of Account Types, Strategies, Sales, Targets, Competitor Brands, and Quantity')
     st.pyplot(plt)
 
 def plot_sales_by_account_type(df):
