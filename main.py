@@ -6,7 +6,7 @@ from time_series_analysis import analyze_time_series
 from market_segmentation import perform_segmentation
 from competitor_analysis import analyze_competitors
 from future_budget import forecast_budget
-from dollar_value_sales import calculate_dollar_value_sales
+from dollar_value_sales import calculate_sales_from_strategy
 from simulate_reallocation_and_switching_cost import simulate_reallocation_and_switching_costs
 
 # Airtable credentials (replace with your actual credentials or load from a config file)
