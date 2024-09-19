@@ -1,14 +1,18 @@
 import streamlit as st
 import pandas as pd
-from utils import load_and_clean_data_from_airtable
+from data_cleaning import clean_data
 from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_trend
 from regression import perform_regression
-from time_series_analysis import analyze_time_series
-from market_segmentation import perform_segmentation
+from time_series import analyze_time_series
+from segmentation import perform_segmentation
 from competitor_analysis import analyze_competitors
-from future_budget import forecast_budget
-from dollar_value_sales import calculate_sales_from_strategy
-from simulate_reallocation_and_switching_cost import simulate_reallocation_and_switching_costs
+from budgeting import forecast_budget
+from dollar_value_sales import calculate_dollar_value_sales
+from simulate_reallocation_and_switching_cost import (
+    simulate_reallocation_and_switching_costs,  # Importing the function
+    calculate_average_marginal_impact           # Importing the AMI function
+)
+from pyairtable import Api
 
 # Title of the Streamlit app
 st.title("Airtable Data Analysis App")
@@ -41,7 +45,7 @@ if airtable_token and base_id and table_name:
     if st.sidebar.button("Load and Clean Data"):
         try:
             # Load and clean the data from Airtable using the utility function
-            df_cleaned = load_and_clean_data_from_airtable(airtable_token, base_id, table_name)
+            df_cleaned = clean_data(df)
 
             # Store the cleaned data in session state
             st.session_state.df_cleaned = df_cleaned
@@ -81,21 +85,10 @@ if airtable_token and base_id and table_name:
 
         if st.sidebar.button("Run Regression Analysis"):
             try:
-                perform_regression(st.session_state.df_cleaned)
+                model = perform_regression(st.session_state.df_cleaned)
+                st.session_state.model = model  # Store model in session state
             except Exception as e:
                 st.error(f"Error performing regression analysis: {e}")
-
-        if st.sidebar.button("Dollar Value of Sales"):
-            try:
-                calculate_sales_from_strategy(st.session_state.df_cleaned)
-            except Exception as e:
-                st.error(f"Error calculating dollar value of sales: {e}")
-
-        if st.sidebar.button("Reallocation & Switching Costs"):
-            try:
-                simulate_reallocation_and_switching_costs(st.session_state.df_cleaned)
-            except Exception as e:
-                st.error(f"Error simulating reallocation and switching costs: {e}")
 
         if st.sidebar.button("Time Series Analysis"):
             try:
@@ -120,6 +113,30 @@ if airtable_token and base_id and table_name:
                 forecast_budget(st.session_state.df_cleaned)
             except Exception as e:
                 st.error(f"Error performing future budget analysis: {e}")
+
+        if st.sidebar.button("Dollar Value Sales Analysis"):
+            try:
+                calculate_dollar_value_sales(st.session_state.df_cleaned)
+            except Exception as e:
+                st.error(f"Error calculating dollar value sales: {e}")
+
+        if st.sidebar.button("Simulate Strategy Reallocation & Switching Costs"):
+            try:
+                if 'model' in st.session_state:
+                    simulate_reallocation_and_switching_costs(st.session_state.df_cleaned, st.session_state.model)
+                else:
+                    st.warning("Please run the regression analysis first to create a model.")
+            except Exception as e:
+                st.error(f"Error simulating reallocation and switching costs: {e}")
+
+        if st.sidebar.button("Calculate Average Marginal Impact"):
+            try:
+                if 'model' in st.session_state:
+                    calculate_average_marginal_impact(st.session_state.df_cleaned, st.session_state.model)
+                else:
+                    st.warning("Please run the regression analysis first to create a model.")
+            except Exception as e:
+                st.error(f"Error calculating Average Marginal Impact: {e}")
 
 else:
     st.info("Please provide your Airtable credentials to load and clean data.")
