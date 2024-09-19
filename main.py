@@ -40,7 +40,7 @@ if df_cleaned is not None:
 
         # Dollar Value of Sales
         print("Calculating Dollar Value of Sales...")
-        calculate_dollar_value_sales(df_cleaned)
+        calculate_sales_from_strategy(df_cleaned)
 
         # Reallocation and switching costs
         print("Simulating Reallocation & Switching Costs...")
