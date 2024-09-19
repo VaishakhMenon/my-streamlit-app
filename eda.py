@@ -33,20 +33,9 @@ def plot_correlation_matrix(df):
     
     # Create a copy of the DataFrame with only the available columns
     df_corr = df[available_columns].copy()
-    
-    # Function to convert to numeric if possible, otherwise to categorical
-    def to_numeric_or_categorical(column):
-        if pd.api.types.is_numeric_dtype(column):
-            return column
-        else:
-            try:
-                return pd.to_numeric(column)
-            except ValueError:
-                return column.astype('category')
-    
-    # Apply the conversion function to each column
-    for col in df_corr.columns:
-        df_corr[col] = to_numeric_or_categorical(df_corr[col])
+
+    # Handle NaN values by filling them with a placeholder for correlation purposes
+    df_corr = df_corr.fillna(0)
     
     # Create a correlation matrix
     corr_matrix = pd.DataFrame(index=df_corr.columns, columns=df_corr.columns)
@@ -62,7 +51,10 @@ def plot_correlation_matrix(df):
                     corr_matrix.loc[col1, col2] = np.nan
             else:
                 # Use Pearson correlation for numeric variables
-                corr_matrix.loc[col1, col2] = df_corr[col1].corr(df_corr[col2])
+                try:
+                    corr_matrix.loc[col1, col2] = df_corr[col1].corr(df_corr[col2])
+                except TypeError:
+                    corr_matrix.loc[col1, col2] = np.nan
     
     # Convert correlation matrix to float
     corr_matrix = corr_matrix.astype(float)
@@ -82,18 +74,6 @@ def plot_correlation_matrix(df):
     st.write("Data types and unique values of each column:")
     for col in df_corr.columns:
         st.write(f"{col}: {df_corr[col].dtype.name}, Unique values: {df_corr[col].nunique()}")
-
-# Example usage (you can comment this out if you're importing these functions elsewhere)
-# def main():
-#     st.title("Correlation Analysis")
-#
-#     # Assume df is your cleaned dataframe
-#     # df = clean_data(your_original_dataframe)
-#     
-#     plot_correlation_matrix(df)
-#
-# if __name__ == "__main__":
-#     main()
 
 def plot_sales_by_account_type(df):
     """
