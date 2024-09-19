@@ -10,8 +10,11 @@ def remove_outliers(df, columns):
     Removes rows with outliers based on Z-scores for the specified columns.
     """
     for col in columns:
-        z_scores = np.abs(stats.zscore(df[col]))
-        df = df[z_scores < 3]  # Keep rows where Z-scores are within +/-3
+        if col in df.columns:
+            # Ensure the column is numeric before computing Z-scores
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+            z_scores = np.abs(stats.zscore(df[col].dropna()))
+            df = df[(z_scores < 3).reindex(df.index, fill_value=True)]  # Keep rows with valid Z-scores
     return df
 
 def plot_correlation_matrix(df):
@@ -31,6 +34,10 @@ def plot_correlation_matrix(df):
     if not available_columns:
         st.warning("No numerical columns available for correlation matrix.")
         return
+    
+    # Ensure the selected columns are numeric, convert where necessary
+    for col in available_columns:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
     
     # Remove rows with missing or NaN values in the selected columns
     df_cleaned = df[available_columns].dropna()
