@@ -148,6 +148,10 @@ def simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, eff
 
     st.altair_chart(chart)
 
+import statsmodels.api as sm
+import pandas as pd
+import streamlit as st
+
 def calculate_average_marginal_impact(df):
     """
     Calculate the Average Marginal Impact (AMI) for each strategy.
@@ -192,7 +196,9 @@ def calculate_average_marginal_impact(df):
     st.write(f"**Average Marginal Impact of Strategy 2:** ${ami_strategy2:,.2f}")
     st.write(f"**Average Marginal Impact of Strategy 3:** ${ami_strategy3:,.2f}")
 
+    # Return AMI values
     return ami_strategy1, ami_strategy2, ami_strategy3
+
     
 def simulate_reallocation_and_switching_costs(df, model):
     st.header("Simulate Strategy Reallocation and Switching Costs")
