@@ -7,33 +7,30 @@ import streamlit as st
 
 def calculate_efficiency(df):
     """
-    Calculate the efficiency of each strategy in terms of sales per dollar spent.
+    Calculate the efficiency of each strategy in terms of sales per unit spent.
+    Efficiency = (Total Sales from Strategy) / (Total Spending on Strategy)
     """
-    # Ensure columns 'strategy1', 'strategy2', 'strategy3', and 'sales' exist
-    if 'strategy1' not in df.columns or 'strategy2' not in df.columns or 'strategy3' not in df.columns or 'sales' not in df.columns:
-        st.error("Required columns for efficiency calculation are missing.")
-        return None
-
-    # Calculate total spending (i.e., sum of each strategy)
+    # Total spending for each strategy is the sum of the strategy values
     total_spending_strategy1 = df['strategy1'].sum()
     total_spending_strategy2 = df['strategy2'].sum()
     total_spending_strategy3 = df['strategy3'].sum()
 
-    # Calculate total sales generated from each strategy based on regression coefficients
-    # Assume we have already calculated these coefficients
-    coeff_strategy1 = 1.2  # Placeholder coefficient for strategy1 (replace with actual model output)
-    coeff_strategy2 = 1.5  # Placeholder coefficient for strategy2 (replace with actual model output)
-    coeff_strategy3 = 0.9  # Placeholder coefficient for strategy3 (replace with actual model output)
+    # Sales from each strategy is calculated as the contribution from each strategy directly
+    total_sales_strategy1 = df['sales'] * (df['strategy1'] / (df['strategy1'] + df['strategy2'] + df['strategy3']))
+    total_sales_strategy2 = df['sales'] * (df['strategy2'] / (df['strategy1'] + df['strategy2'] + df['strategy3']))
+    total_sales_strategy3 = df['sales'] * (df['strategy3'] / (df['strategy1'] + df['strategy2'] + df['strategy3']))
 
-    # Calculate sales generated from each strategy using coefficients
-    total_sales_strategy1 = df['strategy1'] * coeff_strategy1
-    total_sales_strategy2 = df['strategy2'] * coeff_strategy2
-    total_sales_strategy3 = df['strategy3'] * coeff_strategy3
+    # Summing up the total sales for each strategy
+    total_sales_strategy1 = total_sales_strategy1.sum()
+    total_sales_strategy2 = total_sales_strategy2.sum()
+    total_sales_strategy3 = total_sales_strategy3.sum()
 
-    # Calculate efficiency as total sales per dollar spent
-    efficiency_strategy1 = total_sales_strategy1.sum() / total_spending_strategy1
-    efficiency_strategy2 = total_sales_strategy2.sum() / total_spending_strategy2
-    efficiency_strategy3 = total_sales_strategy3.sum() / total_spending_strategy3
+    # Calculate efficiency: sales per dollar spent
+    efficiency_strategy1 = total_sales_strategy1 / total_spending_strategy1
+    efficiency_strategy2 = total_sales_strategy2 / total_spending_strategy2
+    efficiency_strategy3 = total_sales_strategy3 / total_spending_strategy3
+
+    return efficiency_strategy1, efficiency_strategy2, efficiency_strategy3
 
     # Display the results
     st.write("Efficiency of Strategy 1 (Sales per Dollar Spent): ${:,.2f}".format(efficiency_strategy1))
