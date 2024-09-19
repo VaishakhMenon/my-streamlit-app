@@ -146,17 +146,30 @@ def simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, eff
 
     st.altair_chart(chart)
 
-def calculate_average_marginal_impact(df, model=None):
+def calculate_average_marginal_impact(df):
     """
     Calculate the Average Marginal Impact (AMI) for each strategy.
-    AMI shows how much additional sales are generated independently by each strategy.
+    This function will include the regression calculation directly.
     """
+    st.header("Average Marginal Impact (AMI) Calculation")
 
-    if model is None:
-        st.warning("Regression model not available. Please run the regression analysis first.")
-        return
+    # Ensure 'sales' and strategy columns are numeric
+    df['sales'] = pd.to_numeric(df['sales'], errors='coerce')
+    df['strategy1'] = pd.to_numeric(df['strategy1'], errors='coerce')
+    df['strategy2'] = pd.to_numeric(df['strategy2'], errors='coerce')
+    df['strategy3'] = pd.to_numeric(df['strategy3'], errors='coerce')
 
-    # Calculate Average Marginal Impact
+    # Drop rows with missing values in these columns
+    df = df.dropna(subset=['sales', 'strategy1', 'strategy2', 'strategy3'])
+
+    # Run the regression
+    X = df[['strategy1', 'strategy2', 'strategy3']]
+    X = sm.add_constant(X)  # Adds a constant term for the regression
+    y = df['sales']
+    
+    model = sm.OLS(y, X).fit()  # Fit the model
+
+    # Extract coefficients from the regression model
     coeff_strategy1 = model.params['strategy1']
     coeff_strategy2 = model.params['strategy2']
     coeff_strategy3 = model.params['strategy3']
@@ -166,16 +179,17 @@ def calculate_average_marginal_impact(df, model=None):
     average_spending_strategy2 = df['strategy2'].mean()
     average_spending_strategy3 = df['strategy3'].mean()
 
-    # Calculate the AMI for each strategy
+    # Calculate the Average Marginal Impact (AMI) for each strategy
     ami_strategy1 = coeff_strategy1 * average_spending_strategy1
     ami_strategy2 = coeff_strategy2 * average_spending_strategy2
     ami_strategy3 = coeff_strategy3 * average_spending_strategy3
 
-    # Display the AMI results
-    st.subheader("Average Marginal Impact (AMI) of Each Strategy")
-    st.write(f"Average Marginal Impact of Strategy 1: ${ami_strategy1:,.2f}")
-    st.write(f"Average Marginal Impact of Strategy 2: ${ami_strategy2:,.2f}")
-    st.write(f"Average Marginal Impact of Strategy 3: ${ami_strategy3:,.2f}")
+    # Display the results
+    st.write(f"**Average Marginal Impact of Strategy 1:** ${ami_strategy1:,.2f}")
+    st.write(f"**Average Marginal Impact of Strategy 2:** ${ami_strategy2:,.2f}")
+    st.write(f"**Average Marginal Impact of Strategy 3:** ${ami_strategy3:,.2f}")
+
+    return ami_strategy1, ami_strategy2, ami_strategy3
 
 def simulate_reallocation_and_switching_costs(df, model):
     st.header("Simulate Strategy Reallocation and Switching Costs")
