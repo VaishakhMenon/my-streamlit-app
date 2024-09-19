@@ -149,7 +149,7 @@ def simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, eff
 def calculate_average_marginal_impact(df):
     """
     Calculate the Average Marginal Impact (AMI) for each strategy.
-    This function will include the regression calculation directly.
+    This function includes the regression calculation directly.
     """
     st.header("Average Marginal Impact (AMI) Calculation")
 
@@ -166,8 +166,9 @@ def calculate_average_marginal_impact(df):
     X = df[['strategy1', 'strategy2', 'strategy3']]
     X = sm.add_constant(X)  # Adds a constant term for the regression
     y = df['sales']
-    
-    model = sm.OLS(y, X).fit()  # Fit the model
+
+    # Fit the regression model
+    model = sm.OLS(y, X).fit()
 
     # Extract coefficients from the regression model
     coeff_strategy1 = model.params['strategy1']
@@ -190,7 +191,7 @@ def calculate_average_marginal_impact(df):
     st.write(f"**Average Marginal Impact of Strategy 3:** ${ami_strategy3:,.2f}")
 
     return ami_strategy1, ami_strategy2, ami_strategy3
-
+    
 def simulate_reallocation_and_switching_costs(df, model):
     st.header("Simulate Strategy Reallocation and Switching Costs")
     
