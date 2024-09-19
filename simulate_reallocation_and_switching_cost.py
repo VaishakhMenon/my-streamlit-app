@@ -7,48 +7,23 @@ def calculate_efficiency(df):
     Calculate the efficiency of each strategy in terms of sales per unit spent.
     Efficiency = (Total Sales from Strategy) / (Total Spending on Strategy)
     """
-    # Total spending for each strategy is the sum of the strategy values
     total_spending_strategy1 = df['strategy1'].sum()
     total_spending_strategy2 = df['strategy2'].sum()
     total_spending_strategy3 = df['strategy3'].sum()
 
-    # Sales from each strategy is calculated as the contribution from each strategy directly
     total_sales_strategy1 = df['sales'] * (df['strategy1'] / (df['strategy1'] + df['strategy2'] + df['strategy3']))
     total_sales_strategy2 = df['sales'] * (df['strategy2'] / (df['strategy1'] + df['strategy2'] + df['strategy3']))
     total_sales_strategy3 = df['sales'] * (df['strategy3'] / (df['strategy1'] + df['strategy2'] + df['strategy3']))
 
-    # Summing up the total sales for each strategy
     total_sales_strategy1 = total_sales_strategy1.sum()
     total_sales_strategy2 = total_sales_strategy2.sum()
     total_sales_strategy3 = total_sales_strategy3.sum()
 
-    # Calculate efficiency: sales per dollar spent
     efficiency_strategy1 = total_sales_strategy1 / total_spending_strategy1
     efficiency_strategy2 = total_sales_strategy2 / total_spending_strategy2
     efficiency_strategy3 = total_sales_strategy3 / total_spending_strategy3
 
     return efficiency_strategy1, efficiency_strategy2, efficiency_strategy3
-
-def display_efficiency_table(df):
-    """
-    Display the calculated efficiency scores of each strategy in a table.
-    """
-    efficiency_strategy1, efficiency_strategy2, efficiency_strategy3 = calculate_efficiency(df)
-
-    efficiency_data = {
-        'Strategy': ['Strategy 1', 'Strategy 2', 'Strategy 3'],
-        'Efficiency (Sales per Dollar Spent)': [
-            efficiency_strategy1,
-            efficiency_strategy2,
-            efficiency_strategy3
-        ]
-    }
-
-    efficiency_df = pd.DataFrame(efficiency_data)
-
-    # Display the efficiency table
-    st.subheader("Efficiency of Each Strategy")
-    st.table(efficiency_df)
 
 def simulate_strategy_reallocation(df):
     """
@@ -56,11 +31,15 @@ def simulate_strategy_reallocation(df):
     """
     efficiency_strategy1, efficiency_strategy2, efficiency_strategy3 = calculate_efficiency(df)
 
-    reallocation_percentage = 0.50  # 50% of strategy3's budget
+    # Reallocation: Moving 50% of Strategy 3's spending
+    reallocation_percentage = 0.50
     spending_reallocated = df['strategy3'].sum() * reallocation_percentage
+
+    # Divide the reallocated budget equally between Strategies 1 and 2
     spending_to_strategy1 = spending_reallocated / 2
     spending_to_strategy2 = spending_reallocated / 2
 
+    # New total spending for Strategies 1 and 2
     new_total_spending_strategy1 = df['strategy1'].sum() + spending_to_strategy1
     new_total_spending_strategy2 = df['strategy2'].sum() + spending_to_strategy2
 
@@ -93,6 +72,7 @@ def simulate_switching_costs(df):
     """
     efficiency_strategy1, efficiency_strategy2, _ = calculate_efficiency(df)
 
+    # Reallocate 50% of Strategy 3's budget
     reallocation_percentage = 0.50
     switching_cost_percentage = 0.10
 
@@ -100,13 +80,20 @@ def simulate_switching_costs(df):
     reallocated_to_strategy1 = spending_reallocated / 2
     reallocated_to_strategy2 = spending_reallocated / 2
 
+    # Adjust efficiencies with switching costs (only on reallocated portion)
     adjusted_efficiency_strategy1 = efficiency_strategy1 * (1 - switching_cost_percentage)
     adjusted_efficiency_strategy2 = efficiency_strategy2 * (1 - switching_cost_percentage)
 
+    # Calculate new sales with adjusted efficiencies
     new_sales_strategy1 = reallocated_to_strategy1 * adjusted_efficiency_strategy1
     new_sales_strategy2 = reallocated_to_strategy2 * adjusted_efficiency_strategy2
 
-    new_total_sales_after_switching = new_sales_strategy1 + new_sales_strategy2
+    # Add original sales from Strategies 1 and 2
+    original_sales_strategy1 = df['sales'] * (df['strategy1'] / (df['strategy1'] + df['strategy2'] + df['strategy3'])).sum()
+    original_sales_strategy2 = df['sales'] * (df['strategy2'] / (df['strategy1'] + df['strategy2'] + df['strategy3'])).sum()
+
+    # Calculate new total sales after switching costs
+    new_total_sales_after_switching = new_sales_strategy1 + new_sales_strategy2 + original_sales_strategy1 + original_sales_strategy2
 
     st.write(f"New Total Sales after Switching Costs: ${new_total_sales_after_switching:,.2f}")
 
@@ -125,9 +112,6 @@ def simulate_switching_costs(df):
 
 def simulate_reallocation_and_switching_costs(df):
     st.header("Simulate Strategy Reallocation and Switching Costs")
-    
-    # Display Efficiency Table First
-    display_efficiency_table(df)
     
     st.subheader("1. Strategy Reallocation")
     simulate_strategy_reallocation(df)
