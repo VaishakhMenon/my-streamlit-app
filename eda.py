@@ -25,37 +25,75 @@ def clean_categorical_columns(df, categorical_columns):
 
 def plot_correlation_matrix(df):
     """
-    Plot a correlation matrix for all variables in the dataset, including those converted to numeric.
+    Plot a correlation matrix for all variables in the dataset, including categorical ones.
     """
-    # List of columns to include in the correlation matrix
-    numeric_columns = ['accsize', 'acctargets', 'sales', 'qty', 'strategy1', 'strategy2', 
-                       'strategy3', 'salesvisit1', 'salesvisit2', 'salesvisit3', 
-                       'salesvisit4', 'salesvisit5', 'compbrand', 'quantity']
+    # Display the columns and first few rows for debugging
+    st.write("Column Headers in Cleaned DataFrame:")
+    st.write(df.columns)  # Shows the columns available in the cleaned DataFrame
+    st.write("First few rows of the DataFrame:")
+    st.write(df.head())  # Shows the first few rows of the cleaned DataFrame
 
-    categorical_columns = ['accid', 'acctype', 'compbrand']
+    # List of all columns we want to include
+    all_columns = [
+        'accid', 'acctype', 'accsize', 'acctargets', 'district', 'sales', 'qty',
+        'strategy1', 'strategy2', 'strategy3', 'salesvisit1', 'salesvisit2',
+        'salesvisit3', 'salesvisit4', 'salesvisit5', 'compbrand'
+    ]
+    
+    # Filter to only the columns that exist in the DataFrame
+    available_columns = [col for col in all_columns if col in df.columns]
+    
+    if not available_columns:
+        st.warning("No columns available for correlation matrix.")
+        return
+    
+    # Create a copy of the DataFrame with only the available columns
+    df_corr = df[available_columns].copy()
 
-    # Convert categorical columns to numeric
-    df = clean_categorical_columns(df, categorical_columns)
-
-    # Ensure numeric conversion for selected columns
-    df = convert_to_numeric(df, numeric_columns + categorical_columns)
-
-    # Remove rows with missing or NaN values in the selected columns
-    df_cleaned = df[numeric_columns].dropna()
-
-    # Calculate the correlation matrix
-    corr_matrix = df_cleaned.corr()
-
-    # Plot the correlation matrix
-    plt.figure(figsize=(14, 10))
-    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
-    plt.title('Correlation Matrix of All Key Metrics')
+    # Function to convert to numeric if possible, otherwise to categorical
+    def to_numeric_or_categorical(column):
+        if pd.api.types.is_numeric_dtype(column):
+            return column
+        else:
+            try:
+                return pd.to_numeric(column)
+            except ValueError:
+                return column.astype('category')
+    
+    # Apply the conversion function to each column
+    for col in df_corr.columns:
+        df_corr[col] = to_numeric_or_categorical(df_corr[col])
+    
+    # Create a correlation matrix
+    corr_matrix = pd.DataFrame(index=df_corr.columns, columns=df_corr.columns)
+    
+    for col1 in df_corr.columns:
+        for col2 in df_corr.columns:
+            if df_corr[col1].dtype.name == 'category' or df_corr[col2].dtype.name == 'category':
+                # Use Cramer's V for categorical variables
+                try:
+                    cramers_v = calculate_cramers_v(df_corr[col1], df_corr[col2])
+                    corr_matrix.loc[col1, col2] = cramers_v
+                except ValueError:
+                    corr_matrix.loc[col1, col2] = np.nan
+            else:
+                # Use Pearson correlation for numeric variables
+                corr_matrix.loc[col1, col2] = df_corr[col1].corr(df_corr[col2])
+    
+    # Convert correlation matrix to float
+    corr_matrix = corr_matrix.astype(float)
+    
+    # Plot correlation matrix
+    plt.figure(figsize=(20, 16))
+    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', linewidths=0.5, fmt='.2f', square=True)
+    plt.title("Correlation Matrix of All Key Metrics")
     plt.tight_layout()
     st.pyplot(plt)
-
+    
     # Display the correlation matrix as a table
     st.write("Correlation Matrix:")
     st.write(corr_matrix)
+
 
 def plot_sales_by_account_type(df):
     """
