@@ -72,6 +72,10 @@ def clean_data(df):
         df[col] = df[col].astype(str)
         df[col] = df[col].replace('nan', '')
 
+    # After cleaning, order the columns in original manner
+    df = df[original_column_order]
+
+
     # After cleaning, print the data types and available columns
     st.write("Columns after cleaning:", df.columns)
     st.write("Data types after cleaning:")
@@ -80,5 +84,7 @@ def clean_data(df):
     # Print the number of NaN values in each column
     st.write("Number of NaN values in each column:")
     st.write(df.isna().sum())
+
+    
     
     return df
