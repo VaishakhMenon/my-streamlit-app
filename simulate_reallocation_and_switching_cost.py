@@ -146,39 +146,51 @@ def simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, eff
 
     st.altair_chart(chart)
 
-def calculate_average_marginal_impact(df, model):
+def calculate_average_marginal_impact(df):
     """
-    Calculate the Average Marginal Impact (AMI) of each marketing strategy based on the regression model.
+    Calculate the Average Marginal Impact (AMI) for each strategy.
+    AMI shows how much additional sales are generated independently by each strategy.
     """
-    # Check if the model is None
-    if model is None:
-        st.error("Regression model not available. Please run the regression analysis first.")
-        return
+
+    # Ensure 'sales' and strategies are numeric, and coerce any invalid values
+    df['sales'] = pd.to_numeric(df['sales'], errors='coerce')
+    df['strategy1'] = pd.to_numeric(df['strategy1'], errors='coerce')
+    df['strategy2'] = pd.to_numeric(df['strategy2'], errors='coerce')
+    df['strategy3'] = pd.to_numeric(df['strategy3'], errors='coerce')
+
+    # Drop rows with missing values
+    df = df.dropna(subset=['sales', 'strategy1', 'strategy2', 'strategy3'])
+
+    # Define independent variables (strategies)
+    X = df[['strategy1', 'strategy2', 'strategy3']]
+    X = sm.add_constant(X)  # Adds a constant term for the regression
+
+    # Dependent variable (sales)
+    y = df['sales']
+
+    # Fit the model
+    model = sm.OLS(y, X).fit()
+
+    # Calculate Average Marginal Impact
+    coeff_strategy1 = model.params['strategy1']
+    coeff_strategy2 = model.params['strategy2']
+    coeff_strategy3 = model.params['strategy3']
 
     # Calculate the average spending for each strategy
     average_spending_strategy1 = df['strategy1'].mean()
     average_spending_strategy2 = df['strategy2'].mean()
     average_spending_strategy3 = df['strategy3'].mean()
 
-    # Extract coefficients from the model
-    try:
-        coeff_strategy1 = model.params['strategy1']
-        coeff_strategy2 = model.params['strategy2']
-        coeff_strategy3 = model.params['strategy3']
-    except AttributeError:
-        st.error("Model parameters not found. Ensure regression has been performed.")
-        return
+    # Calculate the AMI for each strategy
+    ami_strategy1 = coeff_strategy1 * average_spending_strategy1
+    ami_strategy2 = coeff_strategy2 * average_spending_strategy2
+    ami_strategy3 = coeff_strategy3 * average_spending_strategy3
 
-    # Calculate the Average Marginal Impact for each strategy
-    AMI_strategy1 = coeff_strategy1 * average_spending_strategy1
-    AMI_strategy2 = coeff_strategy2 * average_spending_strategy2
-    AMI_strategy3 = coeff_strategy3 * average_spending_strategy3
-
-    # Display the Average Marginal Impact
-    st.write(f"Average Marginal Impact of Strategy 1: ${AMI_strategy1:,.2f}")
-    st.write(f"Average Marginal Impact of Strategy 2: ${AMI_strategy2:,.2f}")
-    st.write(f"Average Marginal Impact of Strategy 3: ${AMI_strategy3:,.2f}")
-
+    # Display the AMI results
+    st.subheader("Average Marginal Impact (AMI) of Each Strategy")
+    st.write(f"Average Marginal Impact of Strategy 1: ${ami_strategy1:,.2f}")
+    st.write(f"Average Marginal Impact of Strategy 2: ${ami_strategy2:,.2f}")
+    st.write(f"Average Marginal Impact of Strategy 3: ${ami_strategy3:,.2f}")
 
 def simulate_reallocation_and_switching_costs(df, model):
     st.header("Simulate Strategy Reallocation and Switching Costs")
