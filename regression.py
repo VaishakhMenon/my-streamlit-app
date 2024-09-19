@@ -1,18 +1,66 @@
 import streamlit as st
 import pandas as pd
+import statsmodels.api as sm
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
+import altair as alt
+
+def segmented_strategy_analysis(segment_data, segment_name):
+    """
+    Perform regression analysis for each account type segment and generate plots for each strategy.
+    """
+    st.header(f"Regression Analysis for {segment_name}")
+
+    # Independent variables (strategies)
+    X = segment_data[['strategy1', 'strategy2', 'strategy3']]
+    X = sm.add_constant(X)  # Adds a constant term for the regression
+    # Dependent variable (sales)
+    y = segment_data['sales']
+
+    # Fit the model
+    model = sm.OLS(y, X).fit()
+
+    # Display the summary of the regression model
+    st.subheader(f"Regression Summary for {segment_name}")
+    st.text(model.summary())
+
+    # Plot strategy1 vs. sales with regression line
+    base = alt.Chart(segment_data).mark_point().encode(
+        x='strategy1', y='sales', tooltip=['strategy1', 'sales']
+    ).properties(
+        title=f"{segment_name}: Strategy 1 Impact on Sales"
+    )
+    line = base.transform_regression('strategy1', 'sales').mark_line()
+    plot1 = base + line
+    st.altair_chart(plot1, use_container_width=True)
+
+    # Plot strategy2 vs. sales with regression line
+    base2 = alt.Chart(segment_data).mark_point().encode(
+        x='strategy2', y='sales', tooltip=['strategy2', 'sales']
+    ).properties(
+        title=f"{segment_name}: Strategy 2 Impact on Sales"
+    )
+    line2 = base2.transform_regression('strategy2', 'sales').mark_line()
+    plot2 = base2 + line2
+    st.altair_chart(plot2, use_container_width=True)
+
+    # Plot strategy3 vs. sales with regression line
+    base3 = alt.Chart(segment_data).mark_point().encode(
+        x='strategy3', y='sales', tooltip=['strategy3', 'sales']
+    ).properties(
+        title=f"{segment_name}: Strategy 3 Impact on Sales"
+    )
+    line3 = base3.transform_regression('strategy3', 'sales').mark_line()
+    plot3 = base3 + line3
+    st.altair_chart(plot3, use_container_width=True)
 
 def perform_regression(df):
     """
-    Perform regression analysis by displaying scatter plots for predefined relationships
-    between features and sales, and provide inferences.
+    Perform regression analysis by account type and plot regression lines for each strategy.
     """
-    st.header("Scatter Plots with Inferences")
+    st.header("Segmented Strategy Regression Analysis")
 
-    # Ensure 'sales' and strategies are numeric, and coerce any invalid values
+    # Ensure 'sales' and strategies are numeric
     df['sales'] = pd.to_numeric(df['sales'], errors='coerce')
     df['strategy1'] = pd.to_numeric(df['strategy1'], errors='coerce')
     df['strategy2'] = pd.to_numeric(df['strategy2'], errors='coerce')
@@ -21,36 +69,10 @@ def perform_regression(df):
     # Drop rows with missing values in these columns
     df = df.dropna(subset=['sales', 'strategy1', 'strategy2', 'strategy3'])
 
-    # Define predefined features to compare with sales
-    features = ['strategy1', 'strategy2', 'strategy3']
-
-    # Loop through each feature and create scatter plots with regression lines
-    for feature in features:
-        if feature in df.columns:
-            st.subheader(f"Scatter Plot: {feature} vs. Sales")
-            plt.figure(figsize=(8, 6))
-            sns.regplot(x=feature, y='sales', data=df, ci=None, scatter_kws={'s': 10})
-            plt.xlabel(f"{feature}")
-            plt.ylabel("Sales")
-            plt.title(f"Sales vs. {feature}")
-            st.pyplot(plt)
-
-            # Perform simple regression to show inference
-            X = df[[feature]].dropna()
-            y = df.loc[X.index, 'sales']
-
-            if len(X) > 0 and len(y) > 0:
-                model = LinearRegression()
-                model.fit(X, y)
-                y_pred = model.predict(X)
-
-                mse = mean_squared_error(y, y_pred)
-                r2 = r2_score(y, y_pred)
-
-                st.write(f"**Inference for {feature}:**")
-                st.write(f" - Mean Squared Error (MSE): {mse:.2f}")
-                st.write(f" - R-squared (R²): {r2:.2f}")
-                st.write(f" - Coefficient: {model.coef_[0]:.2f}")
-                st.write(f" - Intercept: {model.intercept_:.2f}")
-        else:
-            st.warning(f"{feature} column not found in the data.")
+    # Segment the data by account type
+    if 'acctype' in df.columns:
+        for segment_name in df['acctype'].unique():
+            segment_data = df[df['acctype'] == segment_name]
+            segmented_strategy_analysis(segment_data, segment_name)
+    else:
+        st.warning("Account type column 'acctype' not found in the data.")
