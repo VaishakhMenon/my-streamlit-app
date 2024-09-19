@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 def clean_data(df):
     """
     Clean the dataset by converting data types, handling missing or invalid values,
-    removing outliers and negative values, and ensuring compatibility with Arrow serialization.
+    and ensuring compatibility with Arrow serialization.
     """
     # Ensure column names are standardized
     df.columns = df.columns.str.strip().str.lower()
@@ -27,64 +27,32 @@ def clean_data(df):
     # Convert 'acctype' to categorical type
     if 'acctype' in df.columns:
         df['acctype'] = df['acctype'].astype('category')
-
-    # Remove rows with negative values in 'sales', 'strategy1', 'strategy2', 'strategy3'
-    df = df[(df['sales'] >= 0) & (df['strategy1'] >= 0) & (df['strategy2'] >= 0) & (df['strategy3'] >= 0)]
-
-    # Handle outliers in 'sales' and 'qty' using the IQR method
-    if 'sales' in df.columns and 'qty' in df.columns:
-        # Boxplots to visualize outliers (optional)
-        plt.figure(figsize=(10, 6))
-        sns.boxplot(data=df['sales'])
-        plt.title('Boxplot of Sales')
-        st.pyplot(plt)
-        plt.figure(figsize=(10, 6))
-        sns.boxplot(data=df['qty'])
-        plt.title('Boxplot of Quantity')
-        st.pyplot(plt)
-        
-        # Instead of removing outliers, cap them at 3 standard deviations
-        for col in ['sales', 'qty']:
-            mean = df[col].mean()
-            std = df[col].std()
-            df[col] = df[col].clip(lower=mean - 3*std, upper=mean + 3*std)
     
-    # Define expected numeric columns
+    # Handle 'qty' column specifically
+    if 'qty' in df.columns:
+        df['qty'] = pd.to_numeric(df['qty'], errors='coerce')
+        df = df.dropna(subset=['qty'])  # Drop rows where 'qty' is NaN
+    
+    # Handle other numerical columns similarly
     numeric_columns = [
         'sales', 'qty', 'strategy1', 'strategy2', 'strategy3',
         'salesvisit1', 'salesvisit2', 'salesvisit3', 'salesvisit4', 'salesvisit5'
     ]
     
-    # Convert existing numeric columns to float and handle infinities and NaNs
+    # Convert all numeric columns
     for col in numeric_columns:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce')
             df[col] = df[col].replace([np.inf, -np.inf], np.nan)
+            # Keep NaN values if necessary, but ensure the column is numeric
     
-    # Convert 'accid' column to string if it exists and handle NaNs
-    if 'accid' in df.columns:
-        df['accid'] = df['accid'].astype(str)
-        df['accid'] = df['accid'].replace('nan', '')
+    # Handle 'accid' column as before (if required)
 
-    # Convert any remaining object columns to string and fill NaN with empty string
-    object_columns = df.select_dtypes(include=['object']).columns
-    for col in object_columns:
-        df[col] = df[col].astype(str)
-        df[col] = df[col].replace('nan', '')
+    st.write("Data Types of Cleaned DataFrame:")
+    st.write(df_cleaned.dtypes)
 
-    # After cleaning, order the columns in original manner
-    df = df[original_column_order]
+    st.write("First few rows of the DataFrame:")
+    st.write(df_cleaned[['qty']].head())
 
-
-    # After cleaning, print the data types and available columns
-    st.write("Columns after cleaning:", df.columns)
-    st.write("Data types after cleaning:")
-    st.write(df.dtypes)
-    
-    # Print the number of NaN values in each column
-    st.write("Number of NaN values in each column:")
-    st.write(df.isna().sum())
-
-    
     
     return df
