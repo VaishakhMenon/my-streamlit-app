@@ -1,5 +1,3 @@
-# main.py
-
 import pandas as pd
 from data_cleaning import clean_data
 from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_trend
@@ -8,6 +6,7 @@ from time_series import analyze_time_series
 from segmentation import perform_segmentation
 from competitor_analysis import analyze_competitors
 from budgeting import forecast_budget
+from dollar_value_sales import calculate_sales_from_strategy  # Import the new function
 from pyairtable import Api
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -68,6 +67,10 @@ if df_cleaned is not None:
         # Future budgeting and resource allocation
         print("Calculating future budgeting and resource allocation...")
         forecast_budget(df_cleaned)
+
+        # Calculate sales from strategy and net sales
+        print("Calculating sales and net sales from strategy...")
+        calculate_sales_from_strategy(df_cleaned)
 
     except Exception as e:
         print(f"An error occurred during analysis: {e}")
