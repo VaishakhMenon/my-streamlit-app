@@ -10,9 +10,9 @@ def calculate_efficiency(df):
     total_spending_strategy2 = df['strategy2'].sum()
     total_spending_strategy3 = df['strategy3'].sum()
 
-    total_sales_strategy1 = df['strategy1'] * df['sales'].sum() / df['strategy1'].sum()
-    total_sales_strategy2 = df['strategy2'] * df['sales'].sum() / df['strategy2'].sum()
-    total_sales_strategy3 = df['strategy3'] * df['sales'].sum() / df['strategy3'].sum()
+    total_sales_strategy1 = df['sales_from_strategy1'].sum()
+    total_sales_strategy2 = df['sales_from_strategy2'].sum()
+    total_sales_strategy3 = df['sales_from_strategy3'].sum()
 
     efficiency_strategy1 = total_sales_strategy1 / total_spending_strategy1
     efficiency_strategy2 = total_sales_strategy2 / total_spending_strategy2
@@ -29,9 +29,9 @@ def display_efficiency_table(df):
     efficiency_data = {
         'Strategy': ['Strategy 1', 'Strategy 2', 'Strategy 3'],
         'Efficiency (Sales per Dollar Spent)': [
-            efficiency_strategy1.sum(),
-            efficiency_strategy2.sum(),
-            efficiency_strategy3.sum()
+            efficiency_strategy1,
+            efficiency_strategy2,
+            efficiency_strategy3
         ]
     }
 
@@ -43,9 +43,9 @@ def display_efficiency_table(df):
 
 def simulate_strategy_reallocation(df):
     """
-    Simulate reallocating resources from the least efficient strategy to the more efficient ones.
+    Simulate reallocating resources from the least efficient strategy (Strategy 3) to the more efficient ones.
     """
-    efficiency_strategy1, efficiency_strategy2, _ = calculate_efficiency(df)
+    efficiency_strategy1, efficiency_strategy2, efficiency_strategy3 = calculate_efficiency(df)
 
     reallocation_percentage = 0.50  # 50% of strategy3's budget
     spending_reallocated = df['strategy3'].sum() * reallocation_percentage
@@ -55,8 +55,8 @@ def simulate_strategy_reallocation(df):
     new_total_spending_strategy1 = df['strategy1'].sum() + spending_to_strategy1
     new_total_spending_strategy2 = df['strategy2'].sum() + spending_to_strategy2
 
-    new_sales_strategy1 = new_total_spending_strategy1 * float(efficiency_strategy1.sum())
-    new_sales_strategy2 = new_total_spending_strategy2 * float(efficiency_strategy2.sum())
+    new_sales_strategy1 = new_total_spending_strategy1 * efficiency_strategy1
+    new_sales_strategy2 = new_total_spending_strategy2 * efficiency_strategy2
 
     # Summing the new sales values to get the total
     new_total_sales = new_sales_strategy1 + new_sales_strategy2
@@ -90,16 +90,14 @@ def simulate_switching_costs(df):
     reallocated_to_strategy1 = spending_reallocated / 2
     reallocated_to_strategy2 = spending_reallocated / 2
 
-    adjusted_efficiency_strategy1 = float(efficiency_strategy1.sum()) * (1 - switching_cost_percentage)
-    adjusted_efficiency_strategy2 = float(efficiency_strategy2.sum()) * (1 - switching_cost_percentage)
+    adjusted_efficiency_strategy1 = efficiency_strategy1 * (1 - switching_cost_percentage)
+    adjusted_efficiency_strategy2 = efficiency_strategy2 * (1 - switching_cost_percentage)
 
     new_sales_strategy1 = reallocated_to_strategy1 * adjusted_efficiency_strategy1
     new_sales_strategy2 = reallocated_to_strategy2 * adjusted_efficiency_strategy2
 
-    # Ensure conversions to float
-    new_total_sales_after_switching = float(new_sales_strategy1 + new_sales_strategy2)
+    new_total_sales_after_switching = new_sales_strategy1 + new_sales_strategy2
 
-    # Display new total sales after switching costs
     st.write(f"New Total Sales after Switching Costs: ${new_total_sales_after_switching:,.2f}")
 
     switching_cost_chart = pd.DataFrame({
