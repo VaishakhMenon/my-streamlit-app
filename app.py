@@ -6,7 +6,7 @@ from regression import perform_regression
 from time_series_analysis import analyze_time_series
 from market_segmentation import perform_segmentation
 from competitor_analysis import run_competitor_analysis  # Import for competitor analysis
-from future_budget import future_budget_forecasting
+from future_budget import future_budget_forecasting, plot_weighted_budget_allocation
 from dollar_value_sales import calculate_sales_from_strategy
 from simulate_reallocation_and_switching_cost import (
     simulate_reallocation_and_switching_costs,
@@ -114,12 +114,17 @@ if airtable_token and base_id and table_name:
             except Exception as e:
                 st.error(f"Error performing competitor analysis: {e}")
 
-        # Future Budget Allocation
-        if st.sidebar.button("Future Budget Allocation"):
+            st.sidebar.button("Future Budget Forecasting"):
             try:
-                forecast_budget(st.session_state.df_cleaned)
+                future_budget_forecasting()
             except Exception as e:
-                st.error(f"Error performing future budget analysis: {e}")
+                st.error(f"Error in Future Budget Forecasting: {e}")
+
+        if st.sidebar.button("Weighted Budget Allocation"):
+            try:
+                plot_weighted_budget_allocation()
+            except Exception as e:
+                st.error(f"Error in Weighted Budget Allocation: {e}")
 
         # Dollar Value Sales Analysis
         if st.sidebar.button("Dollar Value Sales Analysis"):
