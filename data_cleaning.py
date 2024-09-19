@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 def clean_data(df):
     """
     Clean the dataset by converting data types, handling missing or invalid values,
-    and ensuring compatibility with Arrow serialization.
+    removing outliers and negative values, and ensuring compatibility with Arrow serialization.
     """
     # Ensure column names are standardized
     df.columns = df.columns.str.strip().str.lower()
@@ -20,7 +20,6 @@ def clean_data(df):
     # Convert 'month' column to datetime
     if 'month' in df.columns:
         df['month'] = pd.to_datetime(df['month'], errors='coerce')
-        # Instead of dropping, fill NaT values with a default date
         df['month'].fillna(pd.Timestamp('1970-01-01'), inplace=True)
     else:
         raise KeyError("The 'month' column is missing from the data.")
@@ -28,14 +27,13 @@ def clean_data(df):
     # Convert 'acctype' to categorical type
     if 'acctype' in df.columns:
         df['acctype'] = df['acctype'].astype('category')
-    
-    # Instead of removing rows with negative values, replace them with NaN
-    for col in ['sales', 'strategy1', 'strategy2', 'strategy3']:
-        df.loc[df[col] < 0, col] = np.nan
-    
+
+    # Remove rows with negative values in 'sales', 'strategy1', 'strategy2', 'strategy3'
+    df = df[(df['sales'] >= 0) & (df['strategy1'] >= 0) & (df['strategy2'] >= 0) & (df['strategy3'] >= 0)]
+
     # Handle outliers in 'sales' and 'qty' using the IQR method
     if 'sales' in df.columns and 'qty' in df.columns:
-        # Boxplots to visualize outliers (optional: for display during cleaning)
+        # Boxplots to visualize outliers (optional)
         plt.figure(figsize=(10, 6))
         sns.boxplot(data=df['sales'])
         plt.title('Boxplot of Sales')
@@ -61,37 +59,19 @@ def clean_data(df):
     for col in numeric_columns:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce')
-            # Replace infinite values with NaN
             df[col] = df[col].replace([np.inf, -np.inf], np.nan)
-            # Instead of filling NaN with zero, we'll keep them as NaN for now
     
     # Convert 'accid' column to string if it exists and handle NaNs
     if 'accid' in df.columns:
         df['accid'] = df['accid'].astype(str)
         df['accid'] = df['accid'].replace('nan', '')
-    
+
     # Convert any remaining object columns to string and fill NaN with empty string
     object_columns = df.select_dtypes(include=['object']).columns
     for col in object_columns:
         df[col] = df[col].astype(str)
         df[col] = df[col].replace('nan', '')
-    
-    # Handle remaining columns based on data type
-    for col in df.columns:
-        if df[col].dtype.kind in 'O':  # Object types
-            df[col] = df[col].astype(str)
-            df[col] = df[col].replace('nan', '')
-        elif df[col].dtype.kind in 'iufc':  # Numeric types
-            # Keep NaN values instead of filling them
-            pass
-        elif df[col].dtype.kind == 'b':  # Boolean types
-            df[col] = df[col].fillna(False)
-        elif df[col].dtype.kind == 'M':  # Datetime types
-            df[col] = df[col].fillna(pd.Timestamp('1970-01-01'))
-        else:
-            df[col] = df[col].astype(str)
-            df[col] = df[col].replace('nan', '')
-    
+
     # After cleaning, print the data types and available columns
     st.write("Columns after cleaning:", df.columns)
     st.write("Data types after cleaning:")
