@@ -146,30 +146,15 @@ def simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, eff
 
     st.altair_chart(chart)
 
-def calculate_average_marginal_impact(df):
+def calculate_average_marginal_impact(df, model=None):
     """
     Calculate the Average Marginal Impact (AMI) for each strategy.
     AMI shows how much additional sales are generated independently by each strategy.
     """
 
-    # Ensure 'sales' and strategies are numeric, and coerce any invalid values
-    df['sales'] = pd.to_numeric(df['sales'], errors='coerce')
-    df['strategy1'] = pd.to_numeric(df['strategy1'], errors='coerce')
-    df['strategy2'] = pd.to_numeric(df['strategy2'], errors='coerce')
-    df['strategy3'] = pd.to_numeric(df['strategy3'], errors='coerce')
-
-    # Drop rows with missing values
-    df = df.dropna(subset=['sales', 'strategy1', 'strategy2', 'strategy3'])
-
-    # Define independent variables (strategies)
-    X = df[['strategy1', 'strategy2', 'strategy3']]
-    X = sm.add_constant(X)  # Adds a constant term for the regression
-
-    # Dependent variable (sales)
-    y = df['sales']
-
-    # Fit the model
-    model = sm.OLS(y, X).fit()
+    if model is None:
+        st.warning("Regression model not available. Please run the regression analysis first.")
+        return
 
     # Calculate Average Marginal Impact
     coeff_strategy1 = model.params['strategy1']
