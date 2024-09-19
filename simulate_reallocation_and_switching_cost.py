@@ -5,17 +5,22 @@ import streamlit as st
 def calculate_efficiency(df):
     """
     Calculate the efficiency of each strategy in terms of sales per unit spent.
+    Efficiency = (Total Sales from Strategy) / (Total Spending on Strategy)
     """
+    # Total spending for each strategy is the sum of the strategy values
     total_spending_strategy1 = df['strategy1'].sum()
     total_spending_strategy2 = df['strategy2'].sum()
     total_spending_strategy3 = df['strategy3'].sum()
 
-    total_sales = df['sales'].sum()
+    # Sales from each strategy is calculated as the contribution from each strategy directly
+    total_sales_strategy1 = df['sales'] * (df['strategy1'] / (df['strategy1'] + df['strategy2'] + df['strategy3']))
+    total_sales_strategy2 = df['sales'] * (df['strategy2'] / (df['strategy1'] + df['strategy2'] + df['strategy3']))
+    total_sales_strategy3 = df['sales'] * (df['strategy3'] / (df['strategy1'] + df['strategy2'] + df['strategy3']))
 
-    # Calculate the contribution of each strategy to the total sales
-    total_sales_strategy1 = total_sales * (df['strategy1'].sum() / df[['strategy1', 'strategy2', 'strategy3']].sum().sum())
-    total_sales_strategy2 = total_sales * (df['strategy2'].sum() / df[['strategy1', 'strategy2', 'strategy3']].sum().sum())
-    total_sales_strategy3 = total_sales * (df['strategy3'].sum() / df[['strategy1', 'strategy2', 'strategy3']].sum().sum())
+    # Summing up the total sales for each strategy
+    total_sales_strategy1 = total_sales_strategy1.sum()
+    total_sales_strategy2 = total_sales_strategy2.sum()
+    total_sales_strategy3 = total_sales_strategy3.sum()
 
     # Calculate efficiency: sales per dollar spent
     efficiency_strategy1 = total_sales_strategy1 / total_spending_strategy1
