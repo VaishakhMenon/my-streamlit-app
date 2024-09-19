@@ -44,7 +44,17 @@ if airtable_token and base_id and table_name:
 
     if st.sidebar.button("Load and Clean Data"):
         try:
-            # Load and clean the data from Airtable using the utility function
+            # Initialize Airtable API
+            api = Api(airtable_token)
+
+            # Fetch data from Airtable
+            table = api.table(base_id, table_name)
+            records = table.all()
+
+            # Extract fields from the records
+            df = pd.DataFrame([record['fields'] for record in records])
+
+            # Clean the data
             df_cleaned = clean_data(df)
 
             # Store the cleaned data in session state
@@ -116,7 +126,7 @@ if airtable_token and base_id and table_name:
 
         if st.sidebar.button("Dollar Value Sales Analysis"):
             try:
-                calculate_dollar_value_sales(st.session_state.df_cleaned)
+                calculate_sales_from_strategy(st.session_state.df_cleaned)
             except Exception as e:
                 st.error(f"Error calculating dollar value sales: {e}")
 
