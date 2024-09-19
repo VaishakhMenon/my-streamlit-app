@@ -94,27 +94,48 @@ def simulate_strategy_reallocation(df):
 def simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, efficiency_strategy3):
     """
     Simulate switching costs when reallocating resources between strategies.
+    Adjust the impact of switching costs to reflect a more meaningful portion of the budget.
     """
-    reallocation_percentage = 0.50
-    switching_cost_percentage = 0.10
+    reallocation_percentage = 0.50  # Percentage of strategy3's budget to be reallocated
+    switching_cost_percentage = 0.10  # 10% reduction due to switching costs
 
+    # Calculate the total reallocated spending from strategy 3
     spending_reallocated = df['strategy3'].sum() * reallocation_percentage
     reallocated_to_strategy1 = spending_reallocated / 2
     reallocated_to_strategy2 = spending_reallocated / 2
 
+    # Adjust efficiencies after applying the switching cost penalty
     adjusted_efficiency_strategy1 = efficiency_strategy1 * (1 - switching_cost_percentage)
     adjusted_efficiency_strategy2 = efficiency_strategy2 * (1 - switching_cost_percentage)
 
-    new_sales_strategy1 = reallocated_to_strategy1 * adjusted_efficiency_strategy1
-    new_sales_strategy2 = reallocated_to_strategy2 * adjusted_efficiency_strategy2
+    # Calculate new sales for strategy 1 and strategy 2 after reallocating from strategy 3
+    new_sales_strategy1_after_switching = adjusted_efficiency_strategy1 * reallocated_to_strategy1
+    new_sales_strategy2_after_switching = adjusted_efficiency_strategy2 * reallocated_to_strategy2
 
-    new_total_sales_after_switching = new_sales_strategy1 + new_sales_strategy2
+    # Add back the existing total sales for strategy 1 and strategy 2
+    total_sales_strategy1 = df['sales'] * (df['strategy1'] / (df['strategy1'] + df['strategy2'] + df['strategy3']))
+    total_sales_strategy2 = df['sales'] * (df['strategy2'] / (df['strategy1'] + df['strategy2'] + df['strategy3']))
 
+    total_sales_strategy1 = total_sales_strategy1.sum()
+    total_sales_strategy2 = total_sales_strategy2.sum()
+
+    # Recalculate total sales after switching costs
+    new_total_sales_after_switching = (
+        new_sales_strategy1_after_switching +
+        new_sales_strategy2_after_switching +
+        total_sales_strategy1 + total_sales_strategy2
+    )
+
+    # Display the results
+    st.write(f"Efficiency of Strategy 1 (Sales per Dollar Spent): ${efficiency_strategy1:.2f}")
+    st.write(f"Efficiency of Strategy 2 (Sales per Dollar Spent): ${efficiency_strategy2:.2f}")
+    st.write(f"Efficiency of Strategy 3 (Sales per Dollar Spent): ${efficiency_strategy3:.2f}")
     st.write(f"New Total Sales after Switching Costs: ${new_total_sales_after_switching:,.2f}")
 
+    # Plot the switching cost impact in a bar chart
     switching_cost_chart = pd.DataFrame({
         'Strategy': ['Strategy 1', 'Strategy 2', 'Total'],
-        'Sales': [new_sales_strategy1, new_sales_strategy2, new_total_sales_after_switching]
+        'Sales': [new_sales_strategy1_after_switching, new_sales_strategy2_after_switching, new_total_sales_after_switching]
     })
 
     chart = alt.Chart(switching_cost_chart).mark_bar().encode(
@@ -124,6 +145,7 @@ def simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, eff
     ).properties(title="Sales After Switching Costs")
 
     st.altair_chart(chart)
+
 
 def simulate_reallocation_and_switching_costs(df):
     st.header("Simulate Strategy Reallocation and Switching Costs")
