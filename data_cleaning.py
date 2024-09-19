@@ -13,6 +13,9 @@ def clean_data(df):
     # Ensure column names are standardized
     df.columns = df.columns.str.strip().str.lower()
     
+    # Keep track of the original column order
+    original_column_order = df.columns.tolist()
+
     # Drop the 'Unnamed: 0' column if it exists
     if 'unnamed: 0' in df.columns:
         df.drop(columns=['unnamed: 0'], inplace=True)
@@ -35,7 +38,7 @@ def clean_data(df):
     
     # Handle other numerical columns similarly
     numeric_columns = [
-        'sales', 'qty', 'strategy1', 'strategy2', 'strategy3',
+        'sales', 'strategy1', 'strategy2', 'strategy3',
         'salesvisit1', 'salesvisit2', 'salesvisit3', 'salesvisit4', 'salesvisit5'
     ]
     
@@ -44,18 +47,20 @@ def clean_data(df):
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce')
             df[col] = df[col].replace([np.inf, -np.inf], np.nan)
-            # Keep NaN values if necessary, but ensure the column is numeric
     
-    # Handle 'accid' column as before (if required)
+    # Handle 'accid' column as string, if required
+    if 'accid' in df.columns:
+        df['accid'] = df['accid'].astype(str)
+        df['accid'] = df['accid'].replace('nan', '')
 
+    # Restore the original column order
     df = df[original_column_order]
 
-
+    # Display data types and first few rows
     st.write("Data Types of Cleaned DataFrame:")
-    st.write(df_cleaned.dtypes)
+    st.write(df.dtypes)
 
     st.write("First few rows of the DataFrame:")
-    st.write(df_cleaned[['qty']].head())
+    st.write(df[['qty']].head())
 
-    
     return df
