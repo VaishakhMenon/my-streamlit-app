@@ -114,9 +114,10 @@ if airtable_token and base_id and table_name:
 
         if st.sidebar.button("Competitor Analysis"):
             try:
-                analyze_competitors(st.session_state.df_cleaned)
+                run_competitor_analysis(st.session_state.df_cleaned)
             except Exception as e:
                 st.error(f"Error performing competitor analysis: {e}")
+
 
         if st.sidebar.button("Future Budget Allocation"):
             try:
