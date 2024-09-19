@@ -91,19 +91,21 @@ def simulate_switching_costs(df):
     """
     Simulate switching costs when reallocating resources between strategies.
     """
+    # Calculate efficiency of Strategy 1 and Strategy 2
     efficiency_strategy1, efficiency_strategy2, _ = calculate_efficiency(df)
 
     # Reallocate 50% of Strategy 3's budget
     reallocation_percentage = 0.50
     switching_cost_percentage = 0.10
 
+    # Total spending for Strategy 3 and reallocation amount
     spending_reallocated = df['strategy3'].sum() * reallocation_percentage
     reallocated_to_strategy1 = spending_reallocated / 2
     reallocated_to_strategy2 = spending_reallocated / 2
 
     # Adjust efficiencies with switching costs (only on reallocated portion)
-    adjusted_efficiency_strategy1 = efficiency_strategy1 * (1 - switching_cost_percentage)
-    adjusted_efficiency_strategy2 = efficiency_strategy2 * (1 - switching_cost_percentage)
+    adjusted_efficiency_strategy1 = float(efficiency_strategy1) * (1 - switching_cost_percentage)
+    adjusted_efficiency_strategy2 = float(efficiency_strategy2) * (1 - switching_cost_percentage)
 
     # Calculate new sales with adjusted efficiencies
     new_sales_strategy1 = reallocated_to_strategy1 * adjusted_efficiency_strategy1
@@ -114,15 +116,18 @@ def simulate_switching_costs(df):
     original_sales_strategy2 = df['sales'] * (df['strategy2'] / (df['strategy1'] + df['strategy2'] + df['strategy3'])).sum()
 
     # Calculate new total sales after switching costs
-    new_total_sales_after_switching = new_sales_strategy1 + new_sales_strategy2 + original_sales_strategy1 + original_sales_strategy2
+    new_total_sales_after_switching = float(new_sales_strategy1 + new_sales_strategy2 + original_sales_strategy1 + original_sales_strategy2)
 
-    st.write(f"New Total Sales after Switching Costs: ${float(new_total_sales_after_switching):,.2f}")  # Convert to float
+    # Display new total sales after switching costs
+    st.write(f"New Total Sales after Switching Costs: ${new_total_sales_after_switching:,.2f}")
 
+    # Create a dataframe to visualize sales
     switching_cost_chart = pd.DataFrame({
         'Strategy': ['Strategy 1', 'Strategy 2', 'Total'],
-        'Sales': [float(new_sales_strategy1), float(new_sales_strategy2), float(new_total_sales_after_switching)]  # Ensure scalar values
+        'Sales': [float(new_sales_strategy1), float(new_sales_strategy2), new_total_sales_after_switching]
     })
 
+    # Plotting the chart using Altair
     chart = alt.Chart(switching_cost_chart).mark_bar().encode(
         x='Strategy',
         y='Sales',
