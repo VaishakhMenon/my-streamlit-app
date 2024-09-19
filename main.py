@@ -5,7 +5,7 @@ from regression import perform_regression
 from time_series_analysis import analyze_time_series
 from market_segmentation import perform_segmentation
 from competitor_analysis import analyze_competitors
-from future_budget import forecast_budget
+from future_budget import future_budget_forecasting, plot_weighted_budget_allocation
 from dollar_value_sales import calculate_sales_from_strategy
 from simulate_reallocation_and_switching_cost import simulate_reallocation_and_switching_costs
 from pyairtable import Api
@@ -16,11 +16,12 @@ base_id = 'your_base_id'  # Replace with your actual base ID
 table_name = 'Your Table Name'  # Replace with your actual table name
 
 # Initialize the Airtable API and load data
-api = Api(airtable_token)
-table = api.table(base_id, table_name)
-records = table.all()
-data = [record['fields'] for record in records]
-df = pd.DataFrame(data)
+try:
+    api = Api(airtable_token)
+    table = api.table(base_id, table_name)
+    records = table.all()
+    data = [record['fields'] for record in records]
+    df = pd.DataFrame(data)
 
     # Clean the data using your existing function
     df_cleaned = clean_data(df)
@@ -39,13 +40,14 @@ if df_cleaned is not None:
 
         # Perform regression analysis
         print("Running regression analysis...")
-        perform_regression(df_cleaned)
+        model = perform_regression(df_cleaned)  # Store the regression model for later use
 
         # Dollar Value of Sales
         print("Calculating Dollar Value of Sales...")
         calculate_sales_from_strategy(df_cleaned)
 
         # Simulate reallocation, switching costs, and calculate AMI
+        print("Simulating reallocation and switching costs...")
         simulate_reallocation_and_switching_costs(df_cleaned, model)
 
         # Time series analysis
@@ -62,7 +64,8 @@ if df_cleaned is not None:
 
         # Future budgeting and resource allocation
         print("Calculating future budgeting and resource allocation...")
-        forecast_budget(df_cleaned)
+        future_budget_forecasting()
+        plot_weighted_budget_allocation()
 
     except Exception as e:
         print(f"An error occurred during analysis: {e}")
