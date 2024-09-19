@@ -6,7 +6,7 @@ from regression import perform_regression
 from time_series_analysis import analyze_time_series
 from market_segmentation import perform_segmentation
 from competitor_analysis import run_competitor_analysis  # Import for competitor analysis
-from future_budget import forecast_budget
+from future_budget import future_budget_forecasting
 from dollar_value_sales import calculate_sales_from_strategy
 from simulate_reallocation_and_switching_cost import (
     simulate_reallocation_and_switching_costs,
