@@ -3,77 +3,49 @@ import numpy as np
 import streamlit as st
 import seaborn as sns
 import matplotlib.pyplot as plt
-from scipy import stats as ss
+from scipy import stats
 
-def calculate_cramers_v(x, y):
-    """Calculate Cramer's V statistic for categorical-categorical association."""
-    confusion_matrix = pd.crosstab(x, y)
-    chi2 = ss.chi2_contingency(confusion_matrix)[0]
-    n = confusion_matrix.sum().sum()
-    min_dim = min(confusion_matrix.shape) - 1
-    return np.sqrt(chi2 / (n * min_dim))
+def remove_outliers(df, columns):
+    """
+    Removes rows with outliers based on Z-scores for the specified columns.
+    """
+    for col in columns:
+        z_scores = np.abs(stats.zscore(df[col]))
+        df = df[z_scores < 3]  # Keep rows where Z-scores are within +/-3
+    return df
 
 def plot_correlation_matrix(df):
     """
-    Plot a correlation matrix for all variables in the dataset, including categorical ones.
+    Plot a correlation matrix for numerical variables in the dataset.
     """
-    # List of all columns we want to include
-    all_columns = [
-        'accid', 'acctype', 'accsize', 'acctargets', 'district', 'sales', 'qty',
-        'strategy1', 'strategy2', 'strategy3', 'salesvisit1', 'salesvisit2',
-        'salesvisit3', 'salesvisit4', 'salesvisit5', 'compbrand'
+    # Select only numeric columns for correlation matrix
+    numeric_columns = [
+        'accsize', 'acctargets', 'district', 'sales', 'qty', 'strategy1', 'strategy2', 
+        'strategy3', 'salesvisit1', 'salesvisit2', 'salesvisit3', 'salesvisit4', 
+        'salesvisit5', 'compbrand'
     ]
     
-    # Filter to only the columns that exist in the DataFrame
-    available_columns = [col for col in all_columns if col in df.columns]
+    # Filter out columns that don't exist in the DataFrame
+    available_columns = [col for col in numeric_columns if col in df.columns]
     
     if not available_columns:
-        st.warning("No columns available for correlation matrix.")
+        st.warning("No numerical columns available for correlation matrix.")
         return
     
-    # Create a copy of the DataFrame with only the available columns
-    df_corr = df[available_columns].copy()
+    # Remove rows with missing or NaN values in the selected columns
+    df_cleaned = df[available_columns].dropna()
 
-    # Handle NaN values by filling them with a placeholder for correlation purposes
-    df_corr = df_corr.fillna(0)
-    
-    # Create a correlation matrix
-    corr_matrix = pd.DataFrame(index=df_corr.columns, columns=df_corr.columns)
-    
-    for col1 in df_corr.columns:
-        for col2 in df_corr.columns:
-            if df_corr[col1].dtype.name == 'category' or df_corr[col2].dtype.name == 'category':
-                # Use Cramer's V for categorical variables
-                try:
-                    cramers_v = calculate_cramers_v(df_corr[col1], df_corr[col2])
-                    corr_matrix.loc[col1, col2] = cramers_v
-                except ValueError:
-                    corr_matrix.loc[col1, col2] = np.nan
-            else:
-                # Use Pearson correlation for numeric variables
-                try:
-                    corr_matrix.loc[col1, col2] = df_corr[col1].corr(df_corr[col2])
-                except TypeError:
-                    corr_matrix.loc[col1, col2] = np.nan
-    
-    # Convert correlation matrix to float
-    corr_matrix = corr_matrix.astype(float)
-    
-    # Plot correlation matrix
-    plt.figure(figsize=(20, 16))
-    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', linewidths=0.5, fmt='.2f', square=True)
-    plt.title("Correlation Matrix of All Key Metrics")
-    plt.tight_layout()
+    # Remove outliers for key columns like 'sales' and 'qty'
+    df_cleaned = remove_outliers(df_cleaned, ['sales', 'qty'])
+
+    # Calculate the correlation matrix
+    corr_matrix = df_cleaned.corr()
+
+    # Plot the correlation matrix
+    plt.figure(figsize=(14, 10))
+    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
+    plt.title('Correlation Matrix of Account Types, Strategies, Sales, District, Targets, Competitor Brands, and Quantity')
     st.pyplot(plt)
-    
-    # Display the correlation matrix as a table
-    st.write("Correlation Matrix:")
-    st.write(corr_matrix)
-    
-    # Display information about data types and unique values
-    st.write("Data types and unique values of each column:")
-    for col in df_corr.columns:
-        st.write(f"{col}: {df_corr[col].dtype.name}, Unique values: {df_corr[col].nunique()}")
 
 def plot_sales_by_account_type(df):
     """
