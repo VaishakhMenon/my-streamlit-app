@@ -1,9 +1,6 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
-from scipy import stats
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 def clean_data(df):
     """
@@ -27,31 +24,40 @@ def clean_data(df):
     else:
         raise KeyError("The 'month' column is missing from the data.")
     
-    # Convert 'acctype' to categorical type
+    # Convert columns to appropriate data types
+    if 'accid' in df.columns:
+        df['accid'] = df['accid'].astype(str)
     if 'acctype' in df.columns:
         df['acctype'] = df['acctype'].astype('category')
-    
-    # Handle 'qty' column specifically
+    if 'accsize' in df.columns:
+        df['accsize'] = df['accsize'].astype(int)
+    if 'acctargets' in df.columns:
+        df['acctargets'] = df['acctargets'].astype(int)
+    if 'district' in df.columns:
+        df['district'] = df['district'].astype(int)
+    if 'sales' in df.columns:
+        df['sales'] = df['sales'].astype(int)
     if 'qty' in df.columns:
         df['qty'] = pd.to_numeric(df['qty'], errors='coerce')
         df = df.dropna(subset=['qty'])  # Drop rows where 'qty' is NaN
-    
-    # Handle other numerical columns similarly
-    numeric_columns = [
-        'sales', 'strategy1', 'strategy2', 'strategy3',
-        'salesvisit1', 'salesvisit2', 'salesvisit3', 'salesvisit4', 'salesvisit5'
-    ]
-    
-    # Convert all numeric columns
-    for col in numeric_columns:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors='coerce')
-            df[col] = df[col].replace([np.inf, -np.inf], np.nan)
-    
-    # Handle 'accid' column as string, if required
-    if 'accid' in df.columns:
-        df['accid'] = df['accid'].astype(str)
-        df['accid'] = df['accid'].replace('nan', '')
+    if 'strategy1' in df.columns:
+        df['strategy1'] = df['strategy1'].astype(float)
+    if 'strategy2' in df.columns:
+        df['strategy2'] = df['strategy2'].astype(float)
+    if 'strategy3' in df.columns:
+        df['strategy3'] = df['strategy3'].astype(float)
+    if 'salesvisit1' in df.columns:
+        df['salesvisit1'] = df['salesvisit1'].astype(float)
+    if 'salesvisit2' in df.columns:
+        df['salesvisit2'] = df['salesvisit2'].astype(float)
+    if 'salesvisit3' in df.columns:
+        df['salesvisit3'] = df['salesvisit3'].astype(float)
+    if 'salesvisit4' in df.columns:
+        df['salesvisit4'] = df['salesvisit4'].astype(float)
+    if 'salesvisit5' in df.columns:
+        df['salesvisit5'] = df['salesvisit5'].astype(float)
+    if 'compbrand' in df.columns:
+        df['compbrand'] = df['compbrand'].astype(int)
 
     # Restore the original column order
     df = df[original_column_order]
@@ -61,6 +67,6 @@ def clean_data(df):
     st.write(df.dtypes)
 
     st.write("First few rows of the DataFrame:")
-    st.write(df[['qty']].head())
+    st.write(df.head())
 
     return df
