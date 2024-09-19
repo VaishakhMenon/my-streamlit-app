@@ -88,3 +88,20 @@ def perform_regression(df):
         segmented_strategy_analysis(segment_data, segment_name)
 
 
+ import statsmodels.api as sm
+
+    # Define independent variables (strategies)
+    X = df[['strategy1', 'strategy2', 'strategy3']]
+    X = sm.add_constant(X)  # Adds a constant term for the regression
+
+    # Dependent variable (sales)
+    y = df['sales']
+
+    # Fit the model
+    model = sm.OLS(y, X).fit()
+
+    # Return the model to be used in AMI calculations
+    return model
+
+
+
