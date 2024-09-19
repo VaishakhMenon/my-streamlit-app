@@ -7,10 +7,10 @@ from time_series_analysis import analyze_time_series
 from market_segmentation import perform_segmentation
 from competitor_analysis import analyze_competitors
 from future_budget import forecast_budget
-from simulate_reallocation_and_switching_cost import simulate_strategy_reallocation
+from simulate_reallocation_and_switching_cost import simulate_reallocation_and_switching_costs
 
 # Title of the Streamlit app
-st.title("Airtable Data Analysis and Strategy Reallocation")
+st.title("Airtable Data Analysis App")
 
 # Sidebar for Airtable Base ID and Table Name input
 st.sidebar.header("Airtable Input")
@@ -32,13 +32,12 @@ if 'df_cleaned' not in st.session_state:
 
 if airtable_token and base_id and table_name:
     st.sidebar.header("Data Processing")
-
+    
     if st.sidebar.button("Load and Clean Data"):
         try:
             df_cleaned = load_and_clean_data_from_airtable(airtable_token, base_id, table_name)
             st.session_state.df_cleaned = df_cleaned
-            st.write("Cleaned Data:")
-            st.dataframe(df_cleaned)
+            st.write("Cleaned Data:", df_cleaned.head())
         except Exception as e:
             st.error(f"Error loading or cleaning data: {e}")
 
@@ -47,15 +46,29 @@ if airtable_token and base_id and table_name:
         
         if st.sidebar.button("Plot Correlation Matrix"):
             plot_correlation_matrix(st.session_state.df_cleaned)
+        
         if st.sidebar.button("Plot Sales by Account Type"):
             plot_sales_by_account_type(st.session_state.df_cleaned)
+
+        if st.sidebar.button("Plot Sales Trend"):
+            plot_sales_trend(st.session_state.df_cleaned)
+
         if st.sidebar.button("Run Regression Analysis"):
             perform_regression(st.session_state.df_cleaned)
+
+        if st.sidebar.button("Time Series Analysis"):
+            analyze_time_series(st.session_state.df_cleaned)
+
         if st.sidebar.button("Market Segmentation"):
             perform_segmentation(st.session_state.df_cleaned)
+
         if st.sidebar.button("Competitor Analysis"):
             analyze_competitors(st.session_state.df_cleaned)
-        if st.sidebar.button("Simulate Strategy Reallocation"):
-            simulate_strategy_reallocation(st.session_state.df_cleaned)
+
+        if st.sidebar.button("Future Budget Allocation"):
+            forecast_budget(st.session_state.df_cleaned)
+
+        if st.sidebar.button("Simulate Reallocation and Switching Costs"):
+            simulate_reallocation_and_switching_costs(st.session_state.df_cleaned)
 else:
-    st.info("Please provide Airtable credentials to load and clean data.")
+    st.info("Please provide your Airtable credentials to load and clean data.")
