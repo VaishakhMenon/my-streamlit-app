@@ -114,7 +114,8 @@ if airtable_token and base_id and table_name:
             except Exception as e:
                 st.error(f"Error performing competitor analysis: {e}")
 
-            st.sidebar.button("Future Budget Forecasting"):
+            
+        if st.sidebar.button("Future Budget Forecasting"):
             try:
                 future_budget_forecasting()
             except Exception as e:
