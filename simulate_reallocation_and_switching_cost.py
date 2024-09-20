@@ -2,6 +2,7 @@ import pandas as pd
 import altair as alt
 import streamlit as st
 import statsmodels.api as sm
+from inference import generate_inference  # Importing the inference function
 
 
 def calculate_efficiency(df):
@@ -57,6 +58,11 @@ def display_efficiency_table(df):
     st.subheader("Efficiency of Each Strategy")
     st.table(efficiency_df)
 
+    # Generate inference using OpenAI based on the efficiency data
+    efficiency_summary = efficiency_df.describe().to_dict()
+    inference_result = generate_inference(efficiency_summary)
+    st.write(f"Inference: {inference_result}")
+
 def simulate_strategy_reallocation(df):
     """
     Simulate reallocating resources from the least efficient strategy (Strategy 3) to the more efficient ones.
@@ -92,6 +98,11 @@ def simulate_strategy_reallocation(df):
     ).properties(title="Sales After Reallocation")
 
     st.altair_chart(chart)
+
+    # Generate inference based on the reallocation result
+    reallocation_summary = reallocation_chart.describe().to_dict()
+    inference_result = generate_inference(reallocation_summary)
+    st.write(f"Inference: {inference_result}")
 
 def simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, efficiency_strategy3):
     """
@@ -129,9 +140,6 @@ def simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, eff
     )
 
     # Display the results
-    st.write(f"Efficiency of Strategy 1 (Sales per Dollar Spent): ${efficiency_strategy1:.2f}")
-    st.write(f"Efficiency of Strategy 2 (Sales per Dollar Spent): ${efficiency_strategy2:.2f}")
-    st.write(f"Efficiency of Strategy 3 (Sales per Dollar Spent): ${efficiency_strategy3:.2f}")
     st.write(f"New Total Sales after Switching Costs: ${new_total_sales_after_switching:,.2f}")
 
     # Plot the switching cost impact in a bar chart
@@ -148,9 +156,10 @@ def simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, eff
 
     st.altair_chart(chart)
 
-import statsmodels.api as sm
-import pandas as pd
-import streamlit as st
+    # Generate inference based on the switching costs result
+    switching_summary = switching_cost_chart.describe().to_dict()
+    inference_result = generate_inference(switching_summary)
+    st.write(f"Inference: {inference_result}")
 
 def calculate_average_marginal_impact(df):
     """
@@ -196,10 +205,18 @@ def calculate_average_marginal_impact(df):
     st.write(f"**Average Marginal Impact of Strategy 2:** ${ami_strategy2:,.2f}")
     st.write(f"**Average Marginal Impact of Strategy 3:** ${ami_strategy3:,.2f}")
 
-    # Return AMI values
+    # Generate inference based on AMI calculation
+    ami_summary = {
+        'AMI Strategy 1': ami_strategy1,
+        'AMI Strategy 2': ami_strategy2,
+        'AMI Strategy 3': ami_strategy3
+    }
+    inference_result = generate_inference(ami_summary)
+    st.write(f"Inference: {inference_result}")
+
     return ami_strategy1, ami_strategy2, ami_strategy3
 
-    
+
 def simulate_reallocation_and_switching_costs(df, model):
     st.header("Simulate Strategy Reallocation and Switching Costs")
     
@@ -214,4 +231,4 @@ def simulate_reallocation_and_switching_costs(df, model):
     simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, efficiency_strategy3)
 
     st.subheader("3. Average Marginal Impact (AMI) of Each Strategy")
-    calculate_average_marginal_impact(df, model)
+    calculate_average_marginal_impact(df)
