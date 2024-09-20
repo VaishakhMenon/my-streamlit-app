@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import streamlit as st
+from inference import generate_inference  # Import the inference function
 
 def perform_segmentation(df):
     """
@@ -61,6 +62,13 @@ def perform_segmentation(df):
         plt.grid(True)
         st.pyplot(plt)
 
+        # Generate inference based on the segmentation analysis
+        segmentation_summary = {
+            "Segmented Data Summary": segmented_data.describe().to_dict(),
+            "Correlation Summary": correlations_by_accType.describe().to_dict(),
+        }
+        inference_result = generate_inference(segmentation_summary)
+        st.write(f"Inference: {inference_result}")
+
     else:
         st.error("Required columns 'compbrand', 'sales', or 'acctype' are missing in the dataset.")
-
