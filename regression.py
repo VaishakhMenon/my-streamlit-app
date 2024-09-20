@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import statsmodels.api as sm
 import altair as alt
+from inference import generate_inference  # Import the inference function
 
 def segmented_strategy_analysis(segment_data, segment_name):
     """
@@ -23,6 +24,10 @@ def segmented_strategy_analysis(segment_data, segment_name):
         # Display the summary of the regression model
         st.subheader(f"Regression Summary for {segment_name}")
         st.text(model.summary())
+
+        # Generate inference using the model's summary (e.g., coefficients)
+        inference_result = generate_inference(model.params.to_dict())
+        st.write(f"Inference: {inference_result}")
 
         # Plot strategy1 vs. sales with regression line
         base = alt.Chart(segment_data).mark_point().encode(
@@ -102,7 +107,7 @@ def perform_overall_regression(df):
     df['strategy3'] = pd.to_numeric(df['strategy3'], errors='coerce')
 
     # Drop rows with missing values in these columns
-    df = df.dropna(subset=['sales', 'strategy1', 'strategy2', 'strategy3'])
+    df = df.dropna(subset(['sales', 'strategy1', 'strategy2', 'strategy3']))
 
     # Define independent variables (strategies)
     X = df[['strategy1', 'strategy2', 'strategy3']]
@@ -113,6 +118,10 @@ def perform_overall_regression(df):
 
     # Fit the model
     model = sm.OLS(y, X).fit()
+
+    # Generate inference from the model's summary (e.g., coefficients)
+    inference_result = generate_inference(model.params.to_dict())
+    st.write(f"Inference: {inference_result}")
 
     # Return the model to be used in AMI calculations
     return model
