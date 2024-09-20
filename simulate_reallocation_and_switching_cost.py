@@ -101,7 +101,7 @@ def simulate_strategy_reallocation(df):
 
     # Generate inference based on the reallocation result
     reallocation_summary = reallocation_chart.describe().to_dict()
-    inference_result = generate_inference(reallocation_summary)
+    inference_result = generate_inference(reallocation_summary, "Strategy Reallocation")  # Fix: added "Strategy Reallocation"
     st.write(f"Inference: {inference_result}")
 
 def simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, efficiency_strategy3):
@@ -158,8 +158,9 @@ def simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, eff
 
     # Generate inference based on the switching costs result
     switching_summary = switching_cost_chart.describe().to_dict()
-    inference_result = generate_inference(switching_summary)
+    inference_result = generate_inference(switching_summary, "Switching Costs")  # Fix: added "Switching Costs"
     st.write(f"Inference: {inference_result}")
+
 
 def calculate_average_marginal_impact(df):
     """
