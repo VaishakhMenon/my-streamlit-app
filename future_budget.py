@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
 import numpy as np
+from inference import generate_inference  # Import the inference function
 
 def future_budget_forecasting():
     """
@@ -107,6 +108,16 @@ def future_budget_forecasting():
     st.write(f"**Total Expected Sales without Strategy 3: ${sum(expected_sales_without_strategy3):,.2f} SGD**")
     st.write(f"**Total Expenditure without Strategy 3: ${total_expenditure_without_strategy3:,.2f} SGD**")
 
+    # Generate inference using the sales and expenditure data
+    forecast_summary = {
+        "Expected Sales with Strategy 3": sum(expected_sales_with_strategy3),
+        "Expected Sales without Strategy 3": sum(expected_sales_without_strategy3),
+        "Total Expenditure with Strategy 3": total_expenditure_with_strategy3,
+        "Total Expenditure without Strategy 3": total_expenditure_without_strategy3
+    }
+    inference_result = generate_inference(forecast_summary)
+    st.write(f"Inference: {inference_result}")
+
 def plot_weighted_budget_allocation():
     """
     Calculate weighted budget allocation and expected sales for each strategy and display results.
@@ -173,3 +184,14 @@ def plot_weighted_budget_allocation():
 
     st.write(f"**Total Expected Sales from Allocated Budget: ${sum(expected_sales):,.2f} SGD**")
 
+    # Generate inference using the weighted budget allocation data
+    allocation_summary = {
+        "Recommended Budget Strategy 1": recommended_budget_strategy1,
+        "Recommended Budget Strategy 2": recommended_budget_strategy2,
+        "Recommended Budget Strategy 3": recommended_budget_strategy3,
+        "Expected Sales Strategy 1": expected_sales_strategy1,
+        "Expected Sales Strategy 2": expected_sales_strategy2,
+        "Expected Sales Strategy 3": expected_sales_strategy3
+    }
+    inference_result = generate_inference(allocation_summary)
+    st.write(f"Inference: {inference_result}")
