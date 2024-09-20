@@ -12,7 +12,9 @@ from simulate_reallocation_and_switching_cost import (
     simulate_reallocation_and_switching_costs,
     calculate_average_marginal_impact
 )
+from inference import generate_inference  # Import the inference function
 from pyairtable import Api
+
 
 # Title of the Streamlit app
 st.title("Airtable Data Analysis App")
@@ -68,6 +70,7 @@ if airtable_token and base_id and table_name:
         if st.sidebar.button("Plot Correlation Matrix"):
             try:
                 plot_correlation_matrix(st.session_state.df_cleaned)
+                generate_inference(st.session_state.df_cleaned, "Correlation Matrix")  # Inference
             except Exception as e:
                 st.error(f"Error plotting correlation matrix: {e}")
 
@@ -75,6 +78,7 @@ if airtable_token and base_id and table_name:
         if st.sidebar.button("Plot Sales by Account Type"):
             try:
                 plot_sales_by_account_type(st.session_state.df_cleaned)
+                generate_inference(st.session_state.df_cleaned, "Sales by Account Type")  # Inference
             except Exception as e:
                 st.error(f"Error plotting sales by account type: {e}")
 
@@ -82,6 +86,7 @@ if airtable_token and base_id and table_name:
         if st.sidebar.button("Plot Sales Trend"):
             try:
                 plot_sales_trend(st.session_state.df_cleaned)
+                generate_inference(st.session_state.df_cleaned, "Sales Trend")  # Inference
             except Exception as e:
                 st.error(f"Error plotting sales trend: {e}")
 
@@ -90,6 +95,7 @@ if airtable_token and base_id and table_name:
             try:
                 model = perform_regression(st.session_state.df_cleaned)
                 st.session_state.model = model  # Store model in session state
+                generate_inference(st.session_state.df_cleaned, "Regression analysis")  # Inference
             except Exception as e:
                 st.error(f"Error performing regression analysis: {e}")
 
@@ -97,6 +103,7 @@ if airtable_token and base_id and table_name:
         if st.sidebar.button("Time Series Analysis"):
             try:
                 analyze_time_series(st.session_state.df_cleaned)
+                generate_inference(st.session_state.df_cleaned, "Time Series analysis")  # Inference
             except Exception as e:
                 st.error(f"Error performing time series analysis: {e}")
 
@@ -104,6 +111,7 @@ if airtable_token and base_id and table_name:
         if st.sidebar.button("Market Segmentation"):
             try:
                 perform_segmentation(st.session_state.df_cleaned)
+                generate_inference(st.session_state.df_cleaned, "Market Segmentation")  # Inference
             except Exception as e:
                 st.error(f"Error performing market segmentation: {e}")
 
@@ -111,19 +119,23 @@ if airtable_token and base_id and table_name:
         if st.sidebar.button("Competitor Analysis"):
             try:
                 run_competitor_analysis(st.session_state.df_cleaned)
+                generate_inference(st.session_state.df_cleaned, "Competitor Analysis")  # Inference
             except Exception as e:
                 st.error(f"Error performing competitor analysis: {e}")
 
-            
+        # Future Budget Forecasting
         if st.sidebar.button("Future Budget Forecasting"):
             try:
                 future_budget_forecasting()
+                generate_inference(st.session_state.df_cleaned, "Future Budget Forecasting")  # Inference
             except Exception as e:
                 st.error(f"Error in Future Budget Forecasting: {e}")
 
+        # Weighted Budget Allocation
         if st.sidebar.button("Weighted Budget Allocation"):
             try:
                 plot_weighted_budget_allocation()
+                generate_inference(st.session_state.df_cleaned, "Weighted Budget Allocation")  # Inference
             except Exception as e:
                 st.error(f"Error in Weighted Budget Allocation: {e}")
 
@@ -131,6 +143,7 @@ if airtable_token and base_id and table_name:
         if st.sidebar.button("Dollar Value Sales Analysis"):
             try:
                 calculate_sales_from_strategy(st.session_state.df_cleaned)
+                generate_inference(st.session_state.df_cleaned, "Dollar Value Sales Analysis")  # Inference
             except Exception as e:
                 st.error(f"Error calculating dollar value sales: {e}")
 
@@ -139,6 +152,7 @@ if airtable_token and base_id and table_name:
             try:
                 if 'model' in st.session_state:
                     simulate_reallocation_and_switching_costs(st.session_state.df_cleaned, st.session_state.model)
+                    generate_inference(st.session_state.df_cleaned, "Strategy Reallocation & Switching Costs")  # Inference
                 else:
                     st.warning("Please run the regression analysis first to create a model.")
             except Exception as e:
@@ -147,11 +161,11 @@ if airtable_token and base_id and table_name:
         # Average Marginal Impact
         if st.sidebar.button("Calculate Average Marginal Impact"):
             try:
-            # Correct the call by passing only df_cleaned, no model required
-                    calculate_average_marginal_impact(st.session_state.df_cleaned)
+                # Correct the call by passing only df_cleaned, no model required
+                calculate_average_marginal_impact(st.session_state.df_cleaned)
+                generate_inference(st.session_state.df_cleaned, "Average Marginal Impact")  # Inference
             except Exception as e:
                 st.error(f"Error calculating Average Marginal Impact: {e}")
-
 
 else:
     st.info("Please provide your Airtable credentials to load and clean data.")
