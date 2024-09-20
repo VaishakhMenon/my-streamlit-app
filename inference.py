@@ -2,11 +2,11 @@ import openai
 import streamlit as st
 
 # Function to generate inferences from OpenAI API
-def generate_inference(data_summary):
+def generate_inference(result_summary, analysis_type):
     openai.api_key = st.secrets["openai"]["api_key"]
 
-    # Prepare a prompt for the OpenAI API
-    prompt = f"Here is the data: {data_summary}. What insights can you derive from it?"
+    # Prepare a prompt for the OpenAI API based on analysis type and result summary
+    prompt = f"Here is the result of {analysis_type}: {result_summary}. What insights can you derive from it?"
 
     # Call the OpenAI API
     response = openai.Completion.create(
