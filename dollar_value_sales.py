@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import statsmodels.api as sm
+from inference import generate_inference  # Import the inference function
 
 def calculate_sales_from_strategy(df):
     """
@@ -83,3 +84,14 @@ def calculate_sales_from_strategy(df):
     st.write("Updated Dataframe with Sales and Net Sales from Each Strategy:")
     st.dataframe(df)
 
+    # Generate inference based on sales and net sales results
+    sales_summary = {
+        "Total Sales Strategy 1": total_sales_strategy1,
+        "Total Sales Strategy 2": total_sales_strategy2,
+        "Total Sales Strategy 3": total_sales_strategy3,
+        "Net Sales Strategy 1": net_sales_strategy1,
+        "Net Sales Strategy 2": net_sales_strategy2,
+        "Net Sales Strategy 3": net_sales_strategy3
+    }
+    inference_result = generate_inference(sales_summary)
+    st.write(f"Inference: {inference_result}")
