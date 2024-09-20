@@ -153,10 +153,17 @@ if airtable_token and base_id and table_name:
         if st.sidebar.button("Dollar Value Sales Analysis"):
             try:
                 dollar_sales_summary = calculate_sales_from_strategy(st.session_state.df_cleaned)
+        
+            try:
                 inference = generate_inference(f"Dollar value sales analysis: {dollar_sales_summary}", "Dollar Value Sales Analysis")
+            except TypeError as e:
+                st.error(f"Error in generating inference for Dollar Value Sales Analysis: {e}")
+
                 st.write(inference)
+
             except Exception as e:
                 st.error(f"Error calculating dollar value sales: {e}")
+
 
         # Simulate Strategy Reallocation & Switching Costs
         if st.sidebar.button("Simulate Strategy Reallocation & Switching Costs"):
