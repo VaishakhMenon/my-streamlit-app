@@ -154,10 +154,10 @@ if airtable_token and base_id and table_name:
             try:
                 dollar_sales_summary = calculate_sales_from_strategy(st.session_state.df_cleaned)
         
-            try:
-                inference = generate_inference(f"Dollar value sales analysis: {dollar_sales_summary}", "Dollar Value Sales Analysis")
-            except TypeError as e:
-                st.error(f"Error in generating inference for Dollar Value Sales Analysis: {e}")
+                try:
+                    inference = generate_inference(f"Dollar value sales analysis: {dollar_sales_summary}", "Dollar Value Sales Analysis")
+                except TypeError as e:
+                    st.error(f"Error in generating inference for Dollar Value Sales Analysis: {e}")
 
                 st.write(inference)
 
