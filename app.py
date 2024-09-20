@@ -162,13 +162,17 @@ if airtable_token and base_id and table_name:
         if st.sidebar.button("Simulate Strategy Reallocation & Switching Costs"):
             try:
                 if 'model' in st.session_state:
+                    # Assuming the function `simulate_reallocation_and_switching_costs()` returns a summary or result
                     reallocation_summary = simulate_reallocation_and_switching_costs(st.session_state.df_cleaned, st.session_state.model)
+            
+                    # Generate inference for the reallocation and switching costs analysis
                     inference = generate_inference(f"Reallocation and switching cost results: {reallocation_summary}", "Strategy Reallocation & Switching Costs")
                     st.write(inference)
                 else:
                     st.warning("Please run the regression analysis first to create a model.")
             except Exception as e:
-                st.error(f"Error simulating reallocation and switching costs: {e}")
+                    st.error(f"Error simulating reallocation and switching costs: {e}")
+
 
         # Example for Average Marginal Impact calculation
         if st.sidebar.button("Calculate Average Marginal Impact"):
