@@ -5,16 +5,15 @@ from eda import plot_correlation_matrix, plot_sales_by_account_type, plot_sales_
 from regression import perform_regression
 from time_series_analysis import analyze_time_series
 from market_segmentation import perform_segmentation
-from competitor_analysis import run_competitor_analysis  # Import for competitor analysis
+from competitor_analysis import run_competitor_analysis
 from future_budget import future_budget_forecasting, plot_weighted_budget_allocation
 from dollar_value_sales import calculate_sales_from_strategy
 from simulate_reallocation_and_switching_cost import (
     simulate_reallocation_and_switching_costs,
     calculate_average_marginal_impact
 )
-from inference import generate_inference  # Import the inference function
+from inference import generate_inference
 from pyairtable import Api
-
 
 # Title of the Streamlit app
 st.title("Airtable Data Analysis App")
@@ -69,81 +68,91 @@ if airtable_token and base_id and table_name:
         # Correlation Matrix
         if st.sidebar.button("Plot Correlation Matrix"):
             try:
-                plot_correlation_matrix(st.session_state.df_cleaned)
-                generate_inference(st.session_state.df_cleaned, "Correlation Matrix")  # Inference
+                corr_matrix = plot_correlation_matrix(st.session_state.df_cleaned)
+                inference = generate_inference(f"Correlation matrix values: {corr_matrix}", "Correlation Matrix")
+                st.write(inference)
             except Exception as e:
                 st.error(f"Error plotting correlation matrix: {e}")
 
         # Sales by Account Type
         if st.sidebar.button("Plot Sales by Account Type"):
             try:
-                plot_sales_by_account_type(st.session_state.df_cleaned)
-                generate_inference(st.session_state.df_cleaned, "Sales by Account Type")  # Inference
+                sales_summary = plot_sales_by_account_type(st.session_state.df_cleaned)
+                inference = generate_inference(f"Sales summary by account type: {sales_summary}", "Sales by Account Type")
+                st.write(inference)
             except Exception as e:
                 st.error(f"Error plotting sales by account type: {e}")
 
         # Sales Trend
         if st.sidebar.button("Plot Sales Trend"):
             try:
-                plot_sales_trend(st.session_state.df_cleaned)
-                generate_inference(st.session_state.df_cleaned, "Sales Trend")  # Inference
+                sales_trend = plot_sales_trend(st.session_state.df_cleaned)
+                inference = generate_inference(f"Sales trend over time: {sales_trend}", "Sales Trend")
+                st.write(inference)
             except Exception as e:
                 st.error(f"Error plotting sales trend: {e}")
 
         # Regression Analysis
         if st.sidebar.button("Run Regression Analysis"):
             try:
-                model = perform_regression(st.session_state.df_cleaned)
-                st.session_state.model = model  # Store model in session state
-                generate_inference(st.session_state.df_cleaned, "Regression analysis")  # Inference
+                model_summary = perform_regression(st.session_state.df_cleaned)
+                st.session_state.model = model_summary  # Store model in session state
+                inference = generate_inference(f"Regression results: {model_summary}", "Regression Analysis")
+                st.write(inference)
             except Exception as e:
                 st.error(f"Error performing regression analysis: {e}")
 
         # Time Series Analysis
         if st.sidebar.button("Time Series Analysis"):
             try:
-                analyze_time_series(st.session_state.df_cleaned)
-                generate_inference(st.session_state.df_cleaned, "Time Series analysis")  # Inference
+                time_series_summary = analyze_time_series(st.session_state.df_cleaned)
+                inference = generate_inference(f"Time series analysis results: {time_series_summary}", "Time Series Analysis")
+                st.write(inference)
             except Exception as e:
                 st.error(f"Error performing time series analysis: {e}")
 
         # Market Segmentation
         if st.sidebar.button("Market Segmentation"):
             try:
-                perform_segmentation(st.session_state.df_cleaned)
-                generate_inference(st.session_state.df_cleaned, "Market Segmentation")  # Inference
+                segmentation_summary = perform_segmentation(st.session_state.df_cleaned)
+                inference = generate_inference(f"Market segmentation summary: {segmentation_summary}", "Market Segmentation")
+                st.write(inference)
             except Exception as e:
                 st.error(f"Error performing market segmentation: {e}")
 
         # Competitor Analysis
         if st.sidebar.button("Competitor Analysis"):
             try:
-                run_competitor_analysis(st.session_state.df_cleaned)
-                generate_inference(st.session_state.df_cleaned, "Competitor Analysis")  # Inference
+                competitor_summary = run_competitor_analysis(st.session_state.df_cleaned)
+                inference = generate_inference(f"Competitor analysis results: {competitor_summary}", "Competitor Analysis")
+                st.write(inference)
             except Exception as e:
                 st.error(f"Error performing competitor analysis: {e}")
 
         # Future Budget Forecasting
         if st.sidebar.button("Future Budget Forecasting"):
             try:
-                future_budget_forecasting()
-                generate_inference(st.session_state.df_cleaned, "Future Budget Forecasting")  # Inference
+                budget_forecast = future_budget_forecasting()
+                inference = generate_inference(f"Budget forecasting results: {budget_forecast}", "Future Budget Forecasting")
+                st.write(inference)
             except Exception as e:
                 st.error(f"Error in Future Budget Forecasting: {e}")
 
         # Weighted Budget Allocation
         if st.sidebar.button("Weighted Budget Allocation"):
             try:
-                plot_weighted_budget_allocation()
-                generate_inference(st.session_state.df_cleaned, "Weighted Budget Allocation")  # Inference
+                weighted_budget_summary = plot_weighted_budget_allocation()
+                inference = generate_inference(f"Weighted budget allocation results: {weighted_budget_summary}", "Weighted Budget Allocation")
+                st.write(inference)
             except Exception as e:
                 st.error(f"Error in Weighted Budget Allocation: {e}")
 
         # Dollar Value Sales Analysis
         if st.sidebar.button("Dollar Value Sales Analysis"):
             try:
-                calculate_sales_from_strategy(st.session_state.df_cleaned)
-                generate_inference(st.session_state.df_cleaned, "Dollar Value Sales Analysis")  # Inference
+                dollar_sales_summary = calculate_sales_from_strategy(st.session_state.df_cleaned)
+                inference = generate_inference(f"Dollar value sales analysis: {dollar_sales_summary}", "Dollar Value Sales Analysis")
+                st.write(inference)
             except Exception as e:
                 st.error(f"Error calculating dollar value sales: {e}")
 
@@ -151,8 +160,9 @@ if airtable_token and base_id and table_name:
         if st.sidebar.button("Simulate Strategy Reallocation & Switching Costs"):
             try:
                 if 'model' in st.session_state:
-                    simulate_reallocation_and_switching_costs(st.session_state.df_cleaned, st.session_state.model)
-                    generate_inference(st.session_state.df_cleaned, "Strategy Reallocation & Switching Costs")  # Inference
+                    reallocation_summary = simulate_reallocation_and_switching_costs(st.session_state.df_cleaned, st.session_state.model)
+                    inference = generate_inference(f"Reallocation and switching cost results: {reallocation_summary}", "Strategy Reallocation & Switching Costs")
+                    st.write(inference)
                 else:
                     st.warning("Please run the regression analysis first to create a model.")
             except Exception as e:
@@ -161,9 +171,9 @@ if airtable_token and base_id and table_name:
         # Average Marginal Impact
         if st.sidebar.button("Calculate Average Marginal Impact"):
             try:
-                # Correct the call by passing only df_cleaned, no model required
-                calculate_average_marginal_impact(st.session_state.df_cleaned)
-                generate_inference(st.session_state.df_cleaned, "Average Marginal Impact")  # Inference
+                ami_summary = calculate_average_marginal_impact(st.session_state.df_cleaned)
+                inference = generate_inference(f"Average Marginal Impact results: {ami_summary}", "Average Marginal Impact")
+                st.write(inference)
             except Exception as e:
                 st.error(f"Error calculating Average Marginal Impact: {e}")
 
