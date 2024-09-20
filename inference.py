@@ -11,5 +11,9 @@ def generate_inference(data_summary, analysis_type):
         max_tokens=150
     )
 
+    st.write(f"data_summary: {data_summary}, analysis_type: {analysis_type}")
+
     # Return the generated inference
     return response.choices[0].text.strip()
+
+
