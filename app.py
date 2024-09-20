@@ -77,6 +77,8 @@ if airtable_token and base_id and table_name:
         # Sales by Account Type
         if st.sidebar.button("Plot Sales by Account Type"):
             try:
+                #sales_summary = plot_sales_by_account_type(st.session_state.df_cleaned)
+                #inference = generate_inference(f"Sales summary by account type: {sales_summary}", "Sales by Account Type")
                 sales_summary = plot_sales_by_account_type(st.session_state.df_cleaned)
                 inference = generate_inference(f"Sales summary by account type: {sales_summary}", "Sales by Account Type")
                 st.write(inference)
@@ -86,6 +88,8 @@ if airtable_token and base_id and table_name:
         # Sales Trend
         if st.sidebar.button("Plot Sales Trend"):
             try:
+                #sales_trend = plot_sales_trend(st.session_state.df_cleaned)
+                #inference = generate_inference(f"Sales trend over time: {sales_trend}", "Sales Trend")
                 sales_trend = plot_sales_trend(st.session_state.df_cleaned)
                 inference = generate_inference(f"Sales trend over time: {sales_trend}", "Sales Trend")
                 st.write(inference)
@@ -132,6 +136,8 @@ if airtable_token and base_id and table_name:
         # Future Budget Forecasting
         if st.sidebar.button("Future Budget Forecasting"):
             try:
+                #budget_forecast = future_budget_forecasting()
+                #inference = generate_inference(f"Budget forecasting results: {budget_forecast}", "Future Budget Forecasting")
                 budget_forecast = future_budget_forecasting()
                 inference = generate_inference(f"Budget forecasting results: {budget_forecast}", "Future Budget Forecasting")
                 st.write(inference)
@@ -168,10 +174,10 @@ if airtable_token and base_id and table_name:
             except Exception as e:
                 st.error(f"Error simulating reallocation and switching costs: {e}")
 
-        # Average Marginal Impact
+        # Example for Average Marginal Impact calculation
         if st.sidebar.button("Calculate Average Marginal Impact"):
             try:
-                ami_summary = calculate_average_marginal_impact(st.session_state.df_cleaned)
+                ami_summary = calculate_average_marginal_impact(st.session_state.df_cleaned)  # Pass only df_cleaned
                 inference = generate_inference(f"Average Marginal Impact results: {ami_summary}", "Average Marginal Impact")
                 st.write(inference)
             except Exception as e:
