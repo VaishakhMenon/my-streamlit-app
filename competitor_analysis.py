@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
+from inference import generate_inference  # Import the inference function
 
 # Function for time series analysis of sales and competitor brands over time
 def time_series_analysis(df):
@@ -44,6 +45,14 @@ def time_series_analysis(df):
     fig.tight_layout()
     st.pyplot(fig)
 
+    # Generate an inference based on the time series data
+    time_series_summary = {
+        "Average Monthly Sales": monthly_sales.mean(),
+        "Average Competitor Brands": monthly_comp_brands.mean(),
+    }
+    inference_result = generate_inference(time_series_summary)
+    st.write(f"Inference: {inference_result}")
+
 # Function to analyze the impact of marketing strategies in the presence of competitors
 def analyze_marketing_strategy_impact(df):
     """
@@ -81,6 +90,16 @@ def analyze_marketing_strategy_impact(df):
     sns.scatterplot(x='strategy3', y='sales', hue='compbrand', data=df, palette='coolwarm')
     plt.title('Strategy 3 Expenditure vs Sales Colored by Competitor Brands')
     st.pyplot(plt)
+
+    # Generate inference for marketing strategy impact
+    strategy_summary = {
+        "Average Strategy 1 Sales": df['strategy1'].mean(),
+        "Average Strategy 2 Sales": df['strategy2'].mean(),
+        "Average Strategy 3 Sales": df['strategy3'].mean(),
+        "Average Competitor Brands": df['compbrand'].mean(),
+    }
+    inference_result = generate_inference(strategy_summary)
+    st.write(f"Inference: {inference_result}")
 
 # Main function to run the competitor analysis
 def run_competitor_analysis(df):
