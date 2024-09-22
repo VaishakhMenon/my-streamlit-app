@@ -20,12 +20,14 @@ def generate_inference(data_summary, analysis_type):
     # Call the OpenAI ChatCompletion API
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            engine="text-davinci-003",
+            prompt=prompt,
             messages=[
                 {"role": "system", "content": "You are a helpful business advisor."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=150
+            max_tokens=300   # Increase max_tokens for a longer response from 150
+            temperature=0.7  # You can also adjust the creativity of the response
         )
 
         # Return the generated business-friendly inference
