@@ -149,25 +149,17 @@ if airtable_token and base_id and table_name:
             except Exception as e:
                 st.error(f"Error in Weighted Budget Allocation: {e}")
 
-        # Dollar Value Sales Analysis
         if st.sidebar.button("Dollar Value Sales Analysis"):
             try:
-                # Calculate sales from strategy and handle potential issues in calculation
                 dollar_sales_summary = calculate_sales_from_strategy(st.session_state.df_cleaned)
-
-                # Ensure a valid result is passed to the inference function
-                if dollar_sales_summary is not None:
-                    try:
-                        # Generate inference from the result
-                        inference = generate_inference(f"Dollar value sales analysis: {dollar_sales_summary}", "Dollar Value Sales Analysis")
-                        st.write(inference)
-                    except TypeError as e:
-                        st.error(f"Error in generating inference for Dollar Value Sales Analysis: {e}")
+                if dollar_sales_summary:
+                    inference = generate_inference(dollar_sales_summary, "Dollar Value Sales Analysis")
+                    st.write(inference)
                 else:
                     st.warning("No data available for Dollar Value Sales Analysis.")
-    
             except Exception as e:
                 st.error(f"Error calculating dollar value sales: {e}")
+
 
 
 
