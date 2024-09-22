@@ -20,7 +20,7 @@ def generate_inference(data_summary, analysis_type):
     # Call the OpenAI ChatCompletion API
     try:
         response = openai.ChatCompletion.create(
-            engine="text-davinci-003",
+            model="text-davinci-003",
             prompt=prompt,
             messages=[
                 {"role": "system", "content": "You are a helpful business advisor."},
