@@ -84,29 +84,29 @@ def calculate_sales_from_strategy(df):
     st.write("Updated Dataframe with Sales and Net Sales from Each Strategy:")
     st.dataframe(df)
 
-    # Generate inference based on sales and net sales results
+    # Format the sales summary as strings to avoid garbling
     sales_summary = {
-        "Total Sales Strategy 1": total_sales_strategy1,
-        "Total Sales Strategy 2": total_sales_strategy2,
-        "Total Sales Strategy 3": total_sales_strategy3,
-        "Net Sales Strategy 1": net_sales_strategy1,
-        "Net Sales Strategy 2": net_sales_strategy2,
-        "Net Sales Strategy 3": net_sales_strategy3
+        "Total Sales Strategy 1": f"SGD {total_sales_strategy1:,.2f}",
+        "Total Sales Strategy 2": f"SGD {total_sales_strategy2:,.2f}",
+        "Total Sales Strategy 3": f"SGD {total_sales_strategy3:,.2f}",
+        "Net Sales Strategy 1": f"SGD {net_sales_strategy1:,.2f}",
+        "Net Sales Strategy 2": f"SGD {net_sales_strategy2:,.2f}",
+        "Net Sales Strategy 3": f"SGD {net_sales_strategy3:,.2f}"
     }
 
-    # Updated prompt for better business insights and recommendations
+    # Better prompt to guide the AI
     prompt = f"""
     The business is analyzing three strategies with the following sales performance in SGD:
 
     Total Sales:
-    - Strategy 1: {total_sales_strategy1:,.2f}
-    - Strategy 2: {total_sales_strategy2:,.2f}
-    - Strategy 3: {total_sales_strategy3:,.2f}
+    - Strategy 1: SGD {total_sales_strategy1:,.2f}
+    - Strategy 2: SGD {total_sales_strategy2:,.2f}
+    - Strategy 3: SGD {total_sales_strategy3:,.2f}
 
     Net Sales after spending:
-    - Strategy 1: {net_sales_strategy1:,.2f}
-    - Strategy 2: {net_sales_strategy2:,.2f}
-    - Strategy 3: {net_sales_strategy3:,.2f}
+    - Strategy 1: SGD {net_sales_strategy1:,.2f}
+    - Strategy 2: SGD {net_sales_strategy2:,.2f}
+    - Strategy 3: SGD {net_sales_strategy3:,.2f}
 
     Based on this information:
     1. Which strategy is performing the best overall?
@@ -114,6 +114,6 @@ def calculate_sales_from_strategy(df):
     3. What actionable recommendations can be made to improve sales performance across these strategies?
     """
 
-    # Pass the prompt to the generate_inference function
+    # Call the generate_inference function with the formatted sales summary
     inference_result = generate_inference(sales_summary, "Dollar Value Sales Analysis")
     st.write(f"Inference: {inference_result}")
