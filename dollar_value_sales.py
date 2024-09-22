@@ -94,25 +94,27 @@ def calculate_sales_from_strategy(df):
         "Net Sales Strategy 3": f"SGD {net_sales_strategy3:,.2f}"
     }
 
-    # Better prompt to guide the AI
+    # Better prompt to guide the AI with actionable recommendations
     prompt = f"""
     The business is analyzing three strategies with the following sales performance in SGD:
 
     Total Sales:
-    - Strategy 1: SGD {total_sales_strategy1:,.2f}
-    - Strategy 2: SGD {total_sales_strategy2:,.2f}
-    - Strategy 3: SGD {total_sales_strategy3:,.2f}
+    - Strategy 1: {sales_summary["Total Sales Strategy 1"]}
+    - Strategy 2: {sales_summary["Total Sales Strategy 2"]}
+    - Strategy 3: {sales_summary["Total Sales Strategy 3"]}
 
     Net Sales after spending:
-    - Strategy 1: SGD {net_sales_strategy1:,.2f}
-    - Strategy 2: SGD {net_sales_strategy2:,.2f}
-    - Strategy 3: SGD {net_sales_strategy3:,.2f}
+    - Strategy 1: {sales_summary["Net Sales Strategy 1"]}
+    - Strategy 2: {sales_summary["Net Sales Strategy 2"]}
+    - Strategy 3: {sales_summary["Net Sales Strategy 3"]}
 
-    Based on this information:
-    1. Which strategy is performing the best overall?
-    2. What risks should the business be aware of with these strategies?
-    3. What actionable recommendations can be made to improve sales performance across these strategies?
+    Please provide:
+    1. The best performing strategy in terms of sales and net profit.
+    2. Specific recommendations to improve the performance of underperforming strategies.
+    3. Potential risks associated with these strategies and suggestions to mitigate them.
+    4. Any other actionable insights to optimize overall sales performance.
     """
+
 
     # Call the generate_inference function with the formatted sales summary
     inference_result = generate_inference(sales_summary, "Dollar Value Sales Analysis")
