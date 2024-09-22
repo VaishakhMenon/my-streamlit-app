@@ -327,7 +327,7 @@ def plot_weighted_budget_allocation():
 
     # Line graph: Weighted Budget Allocation
     plt.figure(figsize=(12, 6))
-    plt.plot(strategies, recommended_budgets, marker='o', color='Here’s how you can update your **app.py** for the **future_budget_forecasting** section based on the structure we’ve used in previous functions:
+    plt.plot(strategies, recommended_budgets, marker='o', color='green', label='Weighted Budget')
 
 ### Future Budget Forecasting Section Update:
 ```python
