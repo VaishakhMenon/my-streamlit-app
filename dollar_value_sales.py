@@ -7,7 +7,7 @@ def calculate_sales_from_strategy(df):
     """
     Calculate total and net sales from each strategy using dynamically calculated coefficients.
     """
-    st.header("Dollar Value of Sales from Each Strategy")
+    st.header("Dollar Value of Sales from Each Strategy (in SGD)")
 
     # Ensure columns are in lowercase
     df.columns = df.columns.str.strip().str.lower()
@@ -70,15 +70,15 @@ def calculate_sales_from_strategy(df):
     net_sales_strategy3 = df['net_sales_from_strategy3'].sum()
 
     # Display the results in Streamlit
-    st.subheader("Total Sales from Each Strategy")
-    st.write(f"Total Sales from Strategy 1: ${total_sales_strategy1:,.2f}")
-    st.write(f"Total Sales from Strategy 2: ${total_sales_strategy2:,.2f}")
-    st.write(f"Total Sales from Strategy 3: ${total_sales_strategy3:,.2f}")
+    st.subheader("Total Sales from Each Strategy (SGD)")
+    st.write(f"Total Sales from Strategy 1: SGD {total_sales_strategy1:,.2f}")
+    st.write(f"Total Sales from Strategy 2: SGD {total_sales_strategy2:,.2f}")
+    st.write(f"Total Sales from Strategy 3: SGD {total_sales_strategy3:,.2f}")
 
-    st.subheader("Net Sales from Each Strategy (After Spending)")
-    st.write(f"Net Sales from Strategy 1: ${net_sales_strategy1:,.2f}")
-    st.write(f"Net Sales from Strategy 2: ${net_sales_strategy2:,.2f}")
-    st.write(f"Net Sales from Strategy 3: ${net_sales_strategy3:,.2f}")
+    st.subheader("Net Sales from Each Strategy (After Spending, in SGD)")
+    st.write(f"Net Sales from Strategy 1: SGD {net_sales_strategy1:,.2f}")
+    st.write(f"Net Sales from Strategy 2: SGD {net_sales_strategy2:,.2f}")
+    st.write(f"Net Sales from Strategy 3: SGD {net_sales_strategy3:,.2f}")
 
     # Optionally, display the updated dataframe
     st.write("Updated Dataframe with Sales and Net Sales from Each Strategy:")
@@ -94,23 +94,26 @@ def calculate_sales_from_strategy(df):
         "Net Sales Strategy 3": net_sales_strategy3
     }
 
-    # Modify the prompt to include actionable insights
+    # Updated prompt for better business insights and recommendations
     prompt = f"""
-    Here is the summary of the Dollar Value Sales Analysis:
-    
-    Total Sales from Strategy 1: ${total_sales_strategy1:,.2f}
-    Total Sales from Strategy 2: ${total_sales_strategy2:,.2f}
-    Total Sales from Strategy 3: ${total_sales_strategy3:,.2f}
+    The business is analyzing three strategies with the following sales performance in SGD:
 
-    Net Sales after Spending for Strategy 1: ${net_sales_strategy1:,.2f}
-    Net Sales after Spending for Strategy 2: ${net_sales_strategy2:,.2f}
-    Net Sales after Spending for Strategy 3: ${net_sales_strategy3:,.2f}
+    Total Sales:
+    - Strategy 1: {total_sales_strategy1:,.2f}
+    - Strategy 2: {total_sales_strategy2:,.2f}
+    - Strategy 3: {total_sales_strategy3:,.2f}
 
-    Please provide insights into the performance of these strategies in business terms:
-    1. Which strategy is the most effective, and why?
-    2. What are the key takeaways from these results for a business owner?
-    3. Recommendations on where to allocate more or fewer resources.
+    Net Sales after spending:
+    - Strategy 1: {net_sales_strategy1:,.2f}
+    - Strategy 2: {net_sales_strategy2:,.2f}
+    - Strategy 3: {net_sales_strategy3:,.2f}
+
+    Based on this information:
+    1. Which strategy is performing the best overall?
+    2. What risks should the business be aware of with these strategies?
+    3. What actionable recommendations can be made to improve sales performance across these strategies?
     """
-    
+
+    # Pass the prompt to the generate_inference function
     inference_result = generate_inference(sales_summary, "Dollar Value Sales Analysis")
     st.write(f"Inference: {inference_result}")
