@@ -26,7 +26,7 @@ def generate_inference(data_summary, analysis_type):
                 {"role": "system", "content": "You are a helpful business advisor."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=300   # Increase max_tokens for a longer response from 150
+            max_tokens=300,   # Increase max_tokens for a longer response from 150
             temperature=0.7  # You can also adjust the creativity of the response
         )
 
