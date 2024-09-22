@@ -151,16 +151,20 @@ if airtable_token and base_id and table_name:
 
         if st.sidebar.button("Dollar Value Sales Analysis"):
             try:
+                # Calculate sales summary from the strategy
                 dollar_sales_summary = calculate_sales_from_strategy(st.session_state.df_cleaned)
-                if dollar_sales_summary:
+
+                # Check if a valid summary is returned before generating the inference
+                if dollar_sales_summary and len(dollar_sales_summary) > 0:
+                    # Generate inference using the OpenAI function
                     inference = generate_inference(dollar_sales_summary, "Dollar Value Sales Analysis")
-                    st.write(inference)
+                    st.write(f"Inference: {inference}")
                 else:
+                    # Show this warning only when there's no valid data summary
                     st.warning("No data available for Dollar Value Sales Analysis.")
             except Exception as e:
+                # Catch any exceptions and display error messages
                 st.error(f"Error calculating dollar value sales: {e}")
-
-
 
 
         # Simulate Strategy Reallocation & Switching Costs
