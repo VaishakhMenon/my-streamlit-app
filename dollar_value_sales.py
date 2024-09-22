@@ -86,14 +86,31 @@ def calculate_sales_from_strategy(df):
 
     # Generate inference based on sales and net sales results
     sales_summary = {
-    "Total Sales Strategy 1": total_sales_strategy1,
-    "Total Sales Strategy 2": total_sales_strategy2,
-    "Total Sales Strategy 3": total_sales_strategy3,
-    "Net Sales Strategy 1": net_sales_strategy1,
-    "Net Sales Strategy 2": net_sales_strategy2,
-    "Net Sales Strategy 3": net_sales_strategy3
+        "Total Sales Strategy 1": total_sales_strategy1,
+        "Total Sales Strategy 2": total_sales_strategy2,
+        "Total Sales Strategy 3": total_sales_strategy3,
+        "Net Sales Strategy 1": net_sales_strategy1,
+        "Net Sales Strategy 2": net_sales_strategy2,
+        "Net Sales Strategy 3": net_sales_strategy3
     }
 
-    # Adding the 'Dollar Value Sales Analysis' as the analysis_type
+    # Modify the prompt to include actionable insights
+    prompt = f"""
+    Here is the summary of the Dollar Value Sales Analysis:
+    
+    Total Sales from Strategy 1: ${total_sales_strategy1:,.2f}
+    Total Sales from Strategy 2: ${total_sales_strategy2:,.2f}
+    Total Sales from Strategy 3: ${total_sales_strategy3:,.2f}
+
+    Net Sales after Spending for Strategy 1: ${net_sales_strategy1:,.2f}
+    Net Sales after Spending for Strategy 2: ${net_sales_strategy2:,.2f}
+    Net Sales after Spending for Strategy 3: ${net_sales_strategy3:,.2f}
+
+    Please provide insights into the performance of these strategies in business terms:
+    1. Which strategy is the most effective, and why?
+    2. What are the key takeaways from these results for a business owner?
+    3. Recommendations on where to allocate more or fewer resources.
+    """
+    
     inference_result = generate_inference(sales_summary, "Dollar Value Sales Analysis")
     st.write(f"Inference: {inference_result}")
