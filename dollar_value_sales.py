@@ -86,12 +86,14 @@ def calculate_sales_from_strategy(df):
 
     # Generate inference based on sales and net sales results
     sales_summary = {
-        "Total Sales Strategy 1": total_sales_strategy1,
-        "Total Sales Strategy 2": total_sales_strategy2,
-        "Total Sales Strategy 3": total_sales_strategy3,
-        "Net Sales Strategy 1": net_sales_strategy1,
-        "Net Sales Strategy 2": net_sales_strategy2,
-        "Net Sales Strategy 3": net_sales_strategy3
+    "Total Sales Strategy 1": total_sales_strategy1,
+    "Total Sales Strategy 2": total_sales_strategy2,
+    "Total Sales Strategy 3": total_sales_strategy3,
+    "Net Sales Strategy 1": net_sales_strategy1,
+    "Net Sales Strategy 2": net_sales_strategy2,
+    "Net Sales Strategy 3": net_sales_strategy3
     }
-    inference_result = generate_inference(sales_summary)
+
+    # Adding the 'Dollar Value Sales Analysis' as the analysis_type
+    inference_result = generate_inference(sales_summary, "Dollar Value Sales Analysis")
     st.write(f"Inference: {inference_result}")
