@@ -9,7 +9,13 @@ def generate_inference(data_summary, analysis_type):
     openai.api_key = st.secrets["openai"]["api_key"]
 
     # Prepare a business-friendly prompt for the OpenAI API
-    prompt = f"As a business expert, please review the following {analysis_type} data summary: {data_summary}. Explain the key takeaways and insights in a clear, simple way that can help a business owner make decisions."
+    prompt = f"""
+    Here is the data summary for {analysis_type}: {data_summary}. 
+    Please provide key insights in simple business terms, including:
+    1. Analysis of the sales trends and performance of each strategy.
+    2. Recommendations for how the business can optimize or adjust based on this analysis.
+    3. Any potential risks or opportunities that the business owner should be aware of.
+    """
 
     # Call the OpenAI ChatCompletion API
     try:
