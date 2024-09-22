@@ -9,4 +9,4 @@ statsmodels
 setuptools
 scipy
 altair
-openai
+openai==0.28
