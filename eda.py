@@ -4,10 +4,10 @@ import streamlit as st
 import seaborn as sns
 import matplotlib.pyplot as plt
 from scipy import stats
-from inference import generate_inference  # Import the inference function
 from scipy.stats import chi2_contingency
-import numpy as np
+from inference import generate_inference  # Import the inference function
 
+# Function to calculate Cramér's V
 def calculate_cramers_v(x, y):
     """
     Calculate Cramér's V statistic for categorical-categorical association.
@@ -110,4 +110,77 @@ def plot_correlation_matrix(df):
 
     # Generate Inference
     inference_result = generate_inference(corr_matrix.to_dict())  # Pass correlation matrix summary
+    st.write(f"Inference: {inference_result}")
+
+
+def plot_sales_by_account_type(df):
+    """
+    Plot the distribution of sales by account type.
+    """
+    df = df.copy()
+    df.columns = df.columns.str.strip().str.lower()
+
+    if 'acctype' not in df.columns or 'sales' not in df.columns:
+        st.warning("Columns 'acctype' and 'sales' are required for this plot.")
+        return
+
+    df['sales'] = pd.to_numeric(df['sales'], errors='coerce')
+    df = df.dropna(subset=['acctype', 'sales'])
+
+    df['sales'] = df['sales'].clip(lower=df['sales'].quantile(0.01), upper=df['sales'].quantile(0.99))
+
+    plt.figure(figsize=(8, 6))
+    sns.boxplot(x='acctype', y='sales', data=df)
+    plt.yscale('log')
+    plt.title("Sales Distribution by Account Type (Log Scale)")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    st.pyplot(plt)
+
+    # Generate Inference
+    sales_summary = df.groupby('acctype')['sales'].describe().to_dict()  # Summary statistics of sales
+    inference_result = generate_inference(sales_summary)
+    st.write(f"Inference: {inference_result}")
+
+
+def plot_sales_trend(df):
+    """
+    Plot the monthly sales trend over time with competitor entries.
+    """
+    df = df.copy()
+    df.columns = df.columns.str.strip().str.lower()
+
+    if 'month' not in df.columns or 'sales' not in df.columns:
+        st.warning("Columns 'month' and 'sales' are required for this plot.")
+        return
+
+    df['month'] = pd.to_datetime(df['month'], errors='coerce')
+    df['sales'] = pd.to_numeric(df['sales'], errors='coerce')
+
+    df = df.dropna(subset=['month', 'sales'])
+
+    df_grouped = df.groupby('month')['sales'].sum().reset_index()
+
+    df_grouped = df_grouped.sort_values('month')
+
+    competitor_entry_dates = ['2014-06', '2015-01']
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(df_grouped['month'], df_grouped['sales'], marker='o', linestyle='-', label='Total Sales in SGD')
+    plt.title("Monthly Sales Trend Over Time with Competitor Entries")
+    plt.xlabel("Month")
+    plt.ylabel("Total Sales in SGD")
+    plt.xticks(rotation=45)
+
+    for date in competitor_entry_dates:
+        plt.axvline(pd.to_datetime(date), color='red', linestyle='--', label=f'Competitor Entry {date}')
+
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    st.pyplot(plt)
+
+    # Generate Inference
+    sales_trend_summary = df_grouped.to_dict()  # Pass the sales trend data summary
+    inference_result = generate_inference(sales_trend_summary)
     st.write(f"Inference: {inference_result}")
