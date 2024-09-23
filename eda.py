@@ -109,7 +109,7 @@ def plot_correlation_matrix(df):
     st.write(corr_matrix)
 
     # Generate Inference
-    inference_result = generate_inference(corr_matrix.to_dict())  # Pass correlation matrix summary
+    inference_result = generate_inference(corr_matrix.to_dict(), "Correlation Matrix Analysis")  # Pass analysis type
     st.write(f"Inference: {inference_result}")
 
 
@@ -139,7 +139,7 @@ def plot_sales_by_account_type(df):
 
     # Generate Inference
     sales_summary = df.groupby('acctype')['sales'].describe().to_dict()  # Summary statistics of sales
-    inference_result = generate_inference(sales_summary)
+    inference_result = generate_inference(sales_summary, "Sales by Account Type Analysis")  # Add analysis type
     st.write(f"Inference: {inference_result}")
 
 
@@ -182,5 +182,5 @@ def plot_sales_trend(df):
 
     # Generate Inference
     sales_trend_summary = df_grouped.to_dict()  # Pass the sales trend data summary
-    inference_result = generate_inference(sales_trend_summary)
+    inference_result = generate_inference(sales_trend_summary, "Sales Trend Analysis")  # Add analysis type
     st.write(f"Inference: {inference_result}")
