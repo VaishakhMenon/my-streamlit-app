@@ -123,15 +123,14 @@ def future_budget_forecasting():
         "Total Expenditure without Strategy 3": f"SGD {total_expenditure_without_strategy3:,.2f}"
     }
 
-    inference_result = generate_inference(forecast_summary, "Future Budget Forecasting")
-    st.write(f"Inference: {inference_result}")
+    try:
+        inference_result = generate_inference(forecast_summary, "Future Budget Forecasting")
+        st.write(f"Inference: {inference_result}")
+    except Exception as e:
+        st.error(f"Error generating inference: {e}")
 
 
 def plot_weighted_budget_allocation():
-    """
-    Calculate weighted budget allocation and expected sales for each strategy and display results.
-    """
-
     total_sales_strategy1 = 712_806_328.76
     total_sales_strategy2 = 3_667_628_376.09
     total_sales_strategy3 = 50_496_439.04
@@ -162,5 +161,32 @@ def plot_weighted_budget_allocation():
 
     plt.figure(figsize=(12, 6))
     plt.plot(strategies, recommended_budgets, marker='o', color='green', label='Weighted Budget')
-    plt.title('Weighted Budget Allocation byHere's the refactored code for your **future_budget_forecasting.py** with the corrected syntax error in `plt.plot()` and improved modularity:
+    plt.title('Weighted Budget Allocation by Strategy [SGD]')
+    plt.ylabel('Budget Allocation (SGD)')
+    plt.grid(True)
+    plt.legend()
+    st.pyplot(plt)
 
+    plt.figure(figsize=(12, 6))
+    plt.plot(strategies, expected_sales, marker='x', color='purple', label='Expected Sales from Weighted Budget')
+    plt.title('Expected Sales from Weighted Budget Allocation [SGD]')
+    plt.ylabel('Expected Sales (SGD)')
+    plt.grid(True)
+    plt.legend()
+    st.pyplot(plt)
+
+    # Generating inference for weighted budget allocation
+    budget_summary = {
+        "Recommended Budget Strategy 1": f"SGD {recommended_budget_strategy1:,.2f}",
+        "Recommended Budget Strategy 2": f"SGD {recommended_budget_strategy2:,.2f}",
+        "Recommended Budget Strategy 3": f"SGD {recommended_budget_strategy3:,.2f}",
+        "Expected Sales Strategy 1": f"SGD {expected_sales_strategy1:,.2f}",
+        "Expected Sales Strategy 2": f"SGD {expected_sales_strategy2:,.2f}",
+        "Expected Sales Strategy 3": f"SGD {expected_sales_strategy3:,.2f}"
+    }
+
+    try:
+        inference_result = generate_inference(budget_summary, "Weighted Budget Allocation")
+        st.write(f"Inference: {inference_result}")
+    except Exception as e:
+        st.error(f"Error generating inference: {e}")
