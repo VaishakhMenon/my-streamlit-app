@@ -11,7 +11,7 @@ def perform_segmentation(df):
     """
     st.header("Market Segmentation by Account Type")
 
-    # Ensure 'compBrand', 'sales', and 'accType' columns exist in the dataset
+    # Ensure 'compbrand', 'sales', and 'acctype' columns exist in the dataset
     if 'compbrand' in df.columns and 'sales' in df.columns and 'acctype' in df.columns:
         
         # Group by account type and competitor brands, then calculate average sales
@@ -45,7 +45,7 @@ def perform_segmentation(df):
             sns.scatterplot(data=subset, x='compbrand', y='sales', hue='compbrand', palette='coolwarm')
             plt.title(f"Sales vs Competitor Brands for {accType}")
             plt.xlabel("Number of Competitor Brands")
-            plt.ylabel("Sales (USD)")
+            plt.ylabel("Sales (SGD)")
             plt.grid(True)
 
         plt.tight_layout()
@@ -67,8 +67,13 @@ def perform_segmentation(df):
             "Segmented Data Summary": segmented_data.describe().to_dict(),
             "Correlation Summary": correlations_by_accType.describe().to_dict(),
         }
-        inference_result = generate_inference(segmentation_summary)
-        st.write(f"Inference: {inference_result}")
+
+        # Updated generate_inference call with analysis_type
+        try:
+            inference_result = generate_inference(segmentation_summary, "Market Segmentation Analysis")
+            st.write(f"Inference: {inference_result}")
+        except Exception as e:
+            st.error(f"Error generating inference: {e}")
 
     else:
         st.error("Required columns 'compbrand', 'sales', or 'acctype' are missing in the dataset.")
