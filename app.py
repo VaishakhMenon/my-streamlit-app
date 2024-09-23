@@ -105,13 +105,13 @@ if airtable_token and base_id and table_name:
                 st.error(f"Error performing regression analysis: {e}")
 
         # Time Series Analysis
-        if st.sidebar.button("Time Series Analysis"):
-            try:
-                time_series_summary = analyze_time_series(st.session_state.df_cleaned)
-                inference = generate_inference(f"Time series analysis results: {time_series_summary}", "Time Series Analysis")
-                st.write(inference)
-            except Exception as e:
-                st.error(f"Error performing time series analysis: {e}")
+        #if st.sidebar.button("Time Series Analysis"):
+            #try:
+                #time_series_summary = analyze_time_series(st.session_state.df_cleaned)
+                #inference = generate_inference(f"Time series analysis results: {time_series_summary}", "Time Series Analysis")
+                #st.write(inference)
+            #except Exception as e:
+                #st.error(f"Error performing time series analysis: {e}")
 
         # Market Segmentation
         if st.sidebar.button("Market Segmentation"):
