@@ -60,7 +60,7 @@ def display_efficiency_table(df):
 
     # Generate inference using OpenAI based on the efficiency data
     efficiency_summary = efficiency_df.describe().to_dict()
-    inference_result = generate_inference(efficiency_summary)
+    inference_result = generate_inference(efficiency_summary, "Efficiency Analysis")  # Added analysis type
     st.write(f"Inference: {inference_result}")
 
 def simulate_strategy_reallocation(df):
@@ -101,7 +101,7 @@ def simulate_strategy_reallocation(df):
 
     # Generate inference based on the reallocation result
     reallocation_summary = reallocation_chart.describe().to_dict()
-    inference_result = generate_inference(reallocation_summary, "Strategy Reallocation")  # Fix: added "Strategy Reallocation"
+    inference_result = generate_inference(reallocation_summary, "Strategy Reallocation")  # Added analysis type
     st.write(f"Inference: {inference_result}")
 
 def simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, efficiency_strategy3):
@@ -158,7 +158,7 @@ def simulate_switching_costs(df, efficiency_strategy1, efficiency_strategy2, eff
 
     # Generate inference based on the switching costs result
     switching_summary = switching_cost_chart.describe().to_dict()
-    inference_result = generate_inference(switching_summary, "Switching Costs")  # Fix: added "Switching Costs"
+    inference_result = generate_inference(switching_summary, "Switching Costs")  # Added analysis type
     st.write(f"Inference: {inference_result}")
 
 
@@ -212,7 +212,7 @@ def calculate_average_marginal_impact(df):
         'AMI Strategy 2': ami_strategy2,
         'AMI Strategy 3': ami_strategy3
     }
-    inference_result = generate_inference(ami_summary)
+    inference_result = generate_inference(ami_summary, "Average Marginal Impact")  # Added analysis type
     st.write(f"Inference: {inference_result}")
 
     return ami_strategy1, ami_strategy2, ami_strategy3
