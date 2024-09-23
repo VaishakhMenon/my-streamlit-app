@@ -26,7 +26,7 @@ def segmented_strategy_analysis(segment_data, segment_name):
         st.text(model.summary())
 
         # Generate inference using the model's summary (e.g., coefficients)
-        inference_result = generate_inference(model.params.to_dict())
+        inference_result = generate_inference(model.params.to_dict(), "Segmented Regression Analysis")
         st.write(f"Inference: {inference_result}")
 
         # Plot strategy1 vs. sales with regression line
@@ -107,7 +107,7 @@ def perform_overall_regression(df):
     df['strategy3'] = pd.to_numeric(df['strategy3'], errors='coerce')
 
     # Drop rows with missing values in these columns
-    df = df.dropna(subset(['sales', 'strategy1', 'strategy2', 'strategy3']))
+    df = df.dropna(subset=['sales', 'strategy1', 'strategy2', 'strategy3'])
 
     # Define independent variables (strategies)
     X = df[['strategy1', 'strategy2', 'strategy3']]
@@ -120,7 +120,7 @@ def perform_overall_regression(df):
     model = sm.OLS(y, X).fit()
 
     # Generate inference from the model's summary (e.g., coefficients)
-    inference_result = generate_inference(model.params.to_dict())
+    inference_result = generate_inference(model.params.to_dict(), "Overall Regression Analysis")  # Add analysis type
     st.write(f"Inference: {inference_result}")
 
     # Return the model to be used in AMI calculations
