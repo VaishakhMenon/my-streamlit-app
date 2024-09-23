@@ -112,11 +112,10 @@ def analyze_marketing_strategy_impact(df):
     except Exception as e:
         st.error(f"Error generating inference: {e}")
 
-    # Main function to run the competitor analysis
-    def run_competitor_analysis(df):
-        """
-        Run the competitor analysis including time series analysis and impact of marketing strategies.
-        """
-        time_series_analysis(df)
-        analyze_marketing_strategy_impact(df)
-
+# Main function to run the competitor analysis
+def run_competitor_analysis(df):
+    """
+    Run the competitor analysis including time series analysis and impact of marketing strategies.
+    """
+    time_series_analysis(df)
+    analyze_marketing_strategy_impact(df)
