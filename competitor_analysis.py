@@ -105,7 +105,7 @@ def analyze_marketing_strategy_impact(df):
         "Average Competitor Brands": df['compbrand'].mean(),
     }
 
-    # This try-except block looks fine
+    # This try-except block handles the inference generation safely
     try:
         inference_result = generate_inference(strategy_summary, "Marketing Strategy Impact Analysis")
         st.write(f"Inference: {inference_result}")
