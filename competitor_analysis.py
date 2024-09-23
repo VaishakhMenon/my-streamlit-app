@@ -14,7 +14,7 @@ def time_series_analysis(df):
     # Step 1: Ensure 'month' is in datetime format
     df['month'] = pd.to_datetime(df['month'], errors='coerce')
 
-    # Step 2: Filter out rows where 'month', 'compbrand', or 'sales' are missing
+    # Step 2: Filter out rows where 'month', 'compBrand', or 'sales' are missing
     df = df.dropna(subset=['month', 'compbrand', 'sales'])
 
     # Step 3: Convert 'sales' and 'compbrand' to numeric if needed
@@ -31,7 +31,7 @@ def time_series_analysis(df):
     # Plot sales over time
     ax1.plot(monthly_sales.index.astype(str), monthly_sales, color='b', marker='o', label='Sales')
     ax1.set_xlabel('Time (Year-Month)')
-    ax1.set_ylabel('Average Sales (SGD)', color='b')
+    ax1.set_ylabel('Average Sales (USD)', color='b')
 
     # Create another axis for the competitor brands
     ax2 = ax1.twinx()
@@ -50,14 +50,8 @@ def time_series_analysis(df):
         "Average Monthly Sales": monthly_sales.mean(),
         "Average Competitor Brands": monthly_comp_brands.mean(),
     }
-
-    # Updated generate_inference call with error handling
-    try:
-        inference_result = generate_inference(time_series_summary, "Time Series Analysis")
-        st.write(f"Inference: {inference_result}")
-    except Exception as e:
-        st.error(f"Error generating inference: {e}")
-
+    inference_result = generate_inference(time_series_summary)
+    st.write(f"Inference: {inference_result}")
 
 # Function to analyze the impact of marketing strategies in the presence of competitors
 def analyze_marketing_strategy_impact(df):
@@ -104,13 +98,8 @@ def analyze_marketing_strategy_impact(df):
         "Average Strategy 3 Sales": df['strategy3'].mean(),
         "Average Competitor Brands": df['compbrand'].mean(),
     }
-
-    try:
-        inference_result = generate_inference(strategy_summary, "Marketing Strategy Impact Analysis")
-        st.write(f"Inference: {inference_result}")
-    except Exception as e:
-        st.error(f"Error generating inference: {e}")
-
+    inference_result = generate_inference(strategy_summary)
+    st.write(f"Inference: {inference_result}")
 
 # Main function to run the competitor analysis
 def run_competitor_analysis(df):
@@ -118,4 +107,4 @@ def run_competitor_analysis(df):
     Run the competitor analysis including time series analysis and impact of marketing strategies.
     """
     time_series_analysis(df)
-    analyze_marketing_strategy_impact(df)
+    analyze_marketing_strategy_impact(df)"
