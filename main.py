@@ -60,9 +60,9 @@ if df_cleaned is not None:
         generate_inference(df_cleaned, "Reallocation & Switching Costs")  # Add inference
 
         # Time series analysis
-        print("Starting time series analysis...")
-        analyze_time_series(df_cleaned)
-        generate_inference(df_cleaned, "Time Series Analysis")  # Add inference
+        #print("Starting time series analysis...")
+        #analyze_time_series(df_cleaned)
+        #generate_inference(df_cleaned, "Time Series Analysis")  # Add inference
 
         # Market segmentation
         print("Performing market segmentation...")
