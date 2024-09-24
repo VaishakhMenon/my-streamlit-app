@@ -16,7 +16,7 @@ from inference import generate_inference
 from pyairtable import Api
 
 # Title of the Streamlit app
-st.title("Airtable Data Analysis App")
+st.title("Market Strategy Analyser")
 
 # Sidebar for Airtable Base ID and Table Name input
 st.sidebar.header("Airtable Input")
